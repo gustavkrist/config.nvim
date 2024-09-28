@@ -93,7 +93,15 @@ return {
   },
   {
     "gbprod/nord.nvim",
+    config = function(_, opts)
+      if vim.g.neovide ~= nil then
+        opts.transparent = false
+      end
+      require("nord").setup(opts)
+      vim.cmd("colorscheme nord")
+    end,
     opts = {
+      transparent = true,
       styles = {
         comments = { italic = false },
       },

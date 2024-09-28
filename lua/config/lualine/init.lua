@@ -1,4 +1,7 @@
 local M = {}
+
+local colors = require("nord.colors").palette
+
 M.setup = function()
   if #vim.api.nvim_list_uis() == 0 then
     -- Headless mode, don't setup lualine
@@ -12,9 +15,31 @@ M.setup = function()
   end
 
   local opts = {
-    style = "lvim",
     options = {
-      theme = "auto",
+      theme = {
+        normal = {
+          a = { fg = colors.frost.ice, bg = "NONE" },
+          b = { fg = colors.snow_storm.brighter, bg = "NONE" },
+          c = { fg = colors.snow_storm.brighter, bg = "NONE" },
+          x = { fg = colors.snow_storm.brighter, bg = "NONE" },
+          y = { fg = colors.aurora.purple, bg = "NONE" },
+          z = { fg = colors.frost.ice, bg = "NONE" },
+        },
+        insert = {
+          a = { fg = colors.snow_storm.origin, bg = "NONE" },
+        },
+        visual = {
+          a = { fg = colors.frost.polar_water, bg = "NONE" },
+        },
+        command = {
+          a = { fg = colors.aurora.purple },
+        },
+        inactive = {
+          a = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
+          b = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
+          c = { fg = colors.polar_night.bright, bg = "NONE" },
+        }
+      },
       globalstatus = true,
       icons_enabled = true,
       component_separators = { left = "", right = "" },

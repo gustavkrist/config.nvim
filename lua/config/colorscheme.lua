@@ -1,11 +1,4 @@
 vim.cmd([[
-try
-  colorscheme nord
-catch /^Vim\%((\a\+)\)\=:E185/
-  colorscheme default
-  set background=dark
-endtry
-
 hi @markup.heading.1.markdown guifg=#D08770
 hi RenderMarkdownH1Bg guifg=#D08770 guibg=#3d3c44
 hi @markup.heading.2.markdown guifg=#EBCB8B
@@ -18,10 +11,5 @@ hi @markup.heading.5.markdown guifg=#B48EAD
 hi RenderMarkdownH5Bg guifg=#B48EAD guibg=#3a3c4a
 hi @markup.heading.6.markdown guifg=#D8DEE9
 hi RenderMarkdownH6Bg guifg=#D8DEE9 guibg=#3d434f
-
-" Transparency
-
-if !exists("g:neovide")
-  hi Normal guibg=None
-endif
+hi! link NoiceLspProgressTitle @comment
 ]])

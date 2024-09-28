@@ -1,6 +1,12 @@
 local conditions = require("config.lualine.conditions")
-local colors = require("config.lualine.colors")
+local palette = require("nord.colors").palette
 local icons = require("util.icons")
+
+local colors = {
+  green = palette.aurora.green,
+  red = palette.aurora.red,
+  yellow = palette.aurora.yellow,
+}
 
 local function diff_source()
   local gitsigns = vim.b.gitsigns_status_dict
