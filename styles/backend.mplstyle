@@ -1,0 +1,9 @@
+font.size : 18
+xtick.color : ECEFF4
+ytick.color : ECEFF4
+savefig.transparent : False
+axes.facecolor : ECEFF4
+axes.titlecolor : ECEFF4
+axes.labelcolor : ECEFF4
+legend.labelcolor : ECEFF4
+savefig.facecolor : (0,0,0,0)
