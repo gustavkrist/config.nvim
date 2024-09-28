@@ -204,6 +204,23 @@ return {
           end
         end,
       })
+      require("util.plugins").on_very_lazy(function()
+        local buftype = vim.api.nvim_get_option_value("buftype", { buf = 0 })
+        if vim.fn.expand("%") == "Starter" and buftype == "nofile" then
+          require("util.git").set_git_session_global()
+          local function wait()
+            if vim.g.git_session_name == nil then
+              vim.defer_fn(wait, 50)
+              return
+            end
+            if vim.g.git_session_name ~= "" then
+              require("mini.sessions").read(vim.g.git_session_name)
+            end
+            vim.g.git_session_name = nil
+          end
+          vim.defer_fn(wait, 50)
+        end
+      end)
     end,
     keys = function()
       return {

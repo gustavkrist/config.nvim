@@ -46,32 +46,6 @@ local definitions = {
     },
   },
   {
-    "VimEnter",
-    {
-      callback = function(args)
-        local sessions_ok, mini_sessions = pcall(require, "mini.sessions")
-        if not sessions_ok then
-          return
-        end
-        local buftype = vim.api.nvim_get_option_value("buftype", { buf = args.buf })
-        if vim.fn.expand("%") == "Starter" and buftype == "nofile" then
-          require("util.git").set_git_session_global()
-          local function wait()
-            if vim.g.git_session_name == nil then
-              vim.defer_fn(wait, 50)
-              return
-            end
-            if vim.g.git_session_name ~= "" then
-              mini_sessions.read(vim.g.git_session_name)
-            end
-            vim.g.git_session_name = nil
-          end
-          vim.defer_fn(wait, 50)
-        end
-      end,
-    },
-  },
-  {
     "FileType",
     {
       pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
