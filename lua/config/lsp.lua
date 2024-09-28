@@ -55,7 +55,9 @@ local vue_language_server_path = require("mason-registry").get_package("vue-lang
 local servers = {
   bashls = true,
   fsautocomplete = true,
-  hls = true,
+  hls = {
+    manual_install = true
+  },
   jsonls = true,
   lua_ls = {
     settings = {
