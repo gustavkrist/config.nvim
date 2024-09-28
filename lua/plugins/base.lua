@@ -23,14 +23,93 @@ return {
       "ToggleTermSendVisualLines",
       "ToggleTermSendVisualSelection",
     },
-    keys = "<C-t>",
+    keys = function()
+      local Terminal = require("toggleterm.terminal").Terminal
+      local lazygit = Terminal:new({ cmd = "lazygit", hidden = true })
+      local function _LAZYGIT_TOGGLE()
+        lazygit:toggle()
+      end
+      return {
+        "<C-t>",
+        { "<C-t>",      "<cmd>execute v:count . 'ToggleTerm'<CR>",          desc = "Toggle Terminal", noremap = true, silent = true },
+        { "<C-t>",      "<Esc><cmd>ToggleTerm<CR>",                         desc = "Toggle Terminal", noremap = true, silent = true },
+        { "<leader>gg", _LAZYGIT_TOGGLE,                                    desc = "Lazygit" },
+        { "<leader>tg", _LAZYGIT_TOGGLE,                                    desc = "Lazygit" },
+        { "<leader>tf", "<cmd>ToggleTerm direction=float<cr>",              desc = "Float" },
+        { "<leader>th", "<cmd>ToggleTerm size=10 direction=horizontal<cr>", desc = "Horizontal" },
+        { "<leader>tv", "<cmd>ToggleTerm size=80 direction=vertical<cr>",   desc = "Vertical" },
+      }
+    end,
   },
-  "folke/which-key.nvim",
+  {
+    "folke/which-key.nvim",
+    config = function(_, opts)
+      local which_key = require("which-key")
+      local mappings = {
+        {
+          mode = "n",
+          { "<leader>o",  group = "Open in" },
+          { "<leader>og", group = "Open in GitHub.." },
+          { "<leader>g",  group = "Git" },
+          { "<leader>t",  group = "Terminal" },
+          { "<leader>l",  group = "Lsp" },
+          { "<leader>s",  group = "Search" },
+          { "<leader>S",  group = "Sessions" },
+        },
+      }
+      which_key.setup(opts)
+      which_key.add(mappings)
+    end,
+    opts = {
+      plugins = {
+        marks = true,       -- shows a list of your marks on ' and `
+        registers = true,   -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+        spelling = {
+          enabled = true,   -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+          suggestions = 20, -- how many suggestions should be shown in the list?
+        },
+        -- the presets plugin, adds help for a bunch of default keybindings in Neovim
+        -- No actual key bindings are created
+        presets = {
+          operators = false,   -- adds help for operators like d, y, ... and registers them for motion / text object completion
+          motions = true,      -- adds help for motions
+          text_objects = true, -- help for text objects triggered after entering an operator
+          windows = false,     -- default bindings on <c-w>
+          nav = false,         -- misc bindings to work with windows
+          z = true,            -- bindings for folds, spelling and others prefixed with z
+          g = true,            -- bindings for prefixed with g
+        },
+      },
+      defaults = {
+        delay = 100,
+      },
+      -- add operators that will trigger motion and text object completion
+      -- to enable all native operators, set the preset / operators plugin above
+      -- operators = { gc = "Comments" },
+      icons = {
+        breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
+        separator = "➜", -- symbol used between a key and it's label
+        group = "+", -- symbol prepended to a group
+      },
+      layout = {
+        height = { min = 4, max = 25 }, -- min and max height of the columns
+        width = { min = 20, max = 50 }, -- min and max width of the columns
+        spacing = 3,                    -- spacing between columns
+        align = "left",                 -- align columns left, center or right
+      },
+      show_help = true,                 -- show help message on the command line when the popup is visible
+      spec = {
+        { "<BS>",      desc = "Decrement Selection", mode = "x" },
+        { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
+      },
+    },
+    lazy = true,
+  },
   {
     "nvim-telescope/telescope.nvim",
-    config = function()
+    opts = function()
       local actions = require("telescope.actions")
-      require("telescope").setup({
+      return {
         extensions = {
           fzf = {
             fuzzy = true,
@@ -45,24 +124,6 @@ return {
               "shorten",
             },
           },
-          -- find_files = {
-          --   layout_strategy = "center",
-          -- },
-          -- git_files = {
-          --   layout_strategy = "center",
-          -- },
-          -- lsp_definitions = {
-          --   layout_strategy = "center",
-          -- },
-          -- lsp_implementations = {
-          --   layout_strategy = "center",
-          -- },
-          -- lsp_references = {
-          --   layout_strategy = "center",
-          -- },
-          -- lsp_type_definitions = {
-          --   layout_strategy = "center",
-          -- },
         },
         defaults = {
           mappings = {
@@ -81,7 +142,80 @@ return {
           },
           layout_strategy = "center",
         },
-      })
+      }
+    end,
+    keys = function()
+      local function telescope_project_root(picker, opts, style)
+        opts = opts or {}
+        local project_root = require("util.root")()
+        if project_root ~= nil then
+          opts.cwd = project_root
+        end
+        if style == "ivy" then
+          opts = require("telescope.themes").get_ivy(opts)
+        end
+        require("telescope.builtin")[picker](opts)
+      end
+      return {
+
+        {
+          "<leader>b",
+          "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({previewer = false}))<cr>",
+          desc = "Buffers",
+        },
+        {
+          "<leader>f",
+          function()
+            telescope_project_root("find_files")
+          end,
+          desc = "Find files",
+        },
+        {
+          "<leader>F",
+          function()
+            telescope_project_root("live_grep", {}, "ivy")
+          end,
+          desc = "Search Text",
+        },
+        { "<leader>go", "<cmd>Telescope git_status<cr>",   desc = "Open changed file" },
+        { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Checkout branch" },
+        { "<leader>gc", "<cmd>Telescope git_commits<cr>",  desc = "Checkout commit" },
+        {
+          "<leader>gC",
+          "<cmd>Telescope git_bcommits<cr>",
+          desc = "Checkout commit(for current file)",
+        },
+        {
+          "<leader>ld",
+          "<cmd>Telescope diagnostics bufnr=0<cr>",
+          desc = "Document Diagnostics",
+        },
+        { "<leader>lw", "<cmd>Telescope diagnostics<cr>",          desc = "Workspace Diagnostics" },
+        { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
+        {
+          "<leader>lS",
+          "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
+          desc = "Workspace Symbols",
+        },
+        { "<leader>sb", "<cmd>Telescope git_branches<cr>", desc = "Checkout branch" },
+        { "<leader>sc", "<cmd>Telescope colorscheme<cr>",  desc = "Colorscheme" },
+        { "<leader>sf", "<cmd>Telescope find_files<cr>",   desc = "Find File" },
+        { "<leader>sh", "<cmd>Telescope help_tags<cr>",    desc = "Find Help" },
+        { "<leader>sH", "<cmd>Telescope highlights<cr>",   desc = "Find highlight groups" },
+        { "<leader>sM", "<cmd>Telescope man_pages<cr>",    desc = "Man Pages" },
+        { "<leader>sr", "<cmd>Telescope oldfiles<cr>",     desc = "Open Recent File" },
+        { "<leader>sR", "<cmd>Telescope resume<cr>",       desc = "Resume" },
+        -- { "<leader>sR", "<cmd>Telescope registers<cr>", desc = "Registers" },
+        { "<leader>st", "<cmd>Telescope live_grep<cr>",    desc = "Text" },
+        { "<leader>sk", "<cmd>Telescope keymaps<cr>",      desc = "Keymaps" },
+        { "<leader>sC", "<cmd>Telescope commands<cr>",     desc = "Commands" },
+        { "<leader>sl", "<cmd>Telescope resume<cr>",       desc = "Resume last search" },
+        {
+          "<leader>sp",
+          "<cmd>lua require('telescope.builtin').colorscheme({enable_preview = true})<cr>",
+          desc = "Colorscheme with Preview",
+        },
+      }
     end,
     cmd = "WhichKey",
     event = "VeryLazy",
@@ -115,6 +249,30 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     opts = {},
+    keys = {
+      {
+        "<leader>gj",
+        "<cmd>lua require('gitsigns').nav_hunk('next', {navigation_message = false})<cr>",
+        desc = "Next Hunk",
+      },
+      {
+        "<leader>gk",
+        "<cmd>lua require('gitsigns').nav_hunk('prev', {navigation_message = false})<cr>",
+        desc = "Prev Hunk",
+      },
+      { "<leader>gl", "<cmd>lua require('gitsigns').blame_line()<cr>",            desc = "Blame" },
+      { "<leader>gL", "<cmd>lua require('gitsigns').blame_line({full=true})<cr>", desc = "Blame Line (full)" },
+      { "<leader>gp", "<cmd>lua require('gitsigns').preview_hunk()<cr>",          desc = "Preview Hunk" },
+      { "<leader>gr", "<cmd>lua require('gitsigns').reset_hunk()<cr>",            desc = "Reset Hunk" },
+      { "<leader>gR", "<cmd>lua require('gitsigns').reset_buffer()<cr>",          desc = "Reset Buffer" },
+      { "<leader>gs", "<cmd>lua require('gitsigns').stage_hunk()<cr>",            desc = "Stage Hunk" },
+      {
+        "<leader>gu",
+        "<cmd>lua require('gitsigns').undo_stage_hunk()<cr>",
+        desc = "Undo Stage Hunk",
+      },
+      { "<leader>bd", "<cmd>Gitsigns diffthis HEAD<cr>", desc = "Git Diff" },
+    },
     event = "User FileOpened",
     cmd = "Gitsigns",
   },

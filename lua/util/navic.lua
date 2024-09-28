@@ -2,94 +2,38 @@ local M = {}
 
 local icons = require("util.icons").kind
 
-M.options = {
-  active = true,
-  on_config_done = nil,
-  winbar_filetype_exclude = {
-    "help",
-    "startify",
-    "dashboard",
-    "lazy",
-    "neo-tree",
-    "neogitstatus",
-    "NvimTree",
-    "Trouble",
-    "alpha",
-    "lir",
-    "Outline",
-    "spectre_panel",
-    "toggleterm",
-    "DressingSelect",
-    "Jaq",
-    "harpoon",
-    "dap-repl",
-    "dap-terminal",
-    "dapui_console",
-    "dapui_hover",
-    "lab",
-    "notify",
-    "noice",
-    "neotest-summary",
-    "ministarter",
-    "",
-  },
-  options = {
-    icons = {
-      Array = icons.Array .. " ",
-      Boolean = icons.Boolean .. " ",
-      Class = icons.Class .. " ",
-      Color = icons.Color .. " ",
-      Constant = icons.Constant .. " ",
-      Constructor = icons.Constructor .. " ",
-      Enum = icons.Enum .. " ",
-      EnumMember = icons.EnumMember .. " ",
-      Event = icons.Event .. " ",
-      Field = icons.Field .. " ",
-      File = icons.File .. " ",
-      Folder = icons.Folder .. " ",
-      Function = icons.Function .. " ",
-      Interface = icons.Interface .. " ",
-      Key = icons.Key .. " ",
-      Keyword = icons.Keyword .. " ",
-      Method = icons.Method .. " ",
-      Module = icons.Module .. " ",
-      Namespace = icons.Namespace .. " ",
-      Null = icons.Null .. " ",
-      Number = icons.Number .. " ",
-      Object = icons.Object .. " ",
-      Operator = icons.Operator .. " ",
-      Package = icons.Package .. " ",
-      Property = icons.Property .. " ",
-      Reference = icons.Reference .. " ",
-      Snippet = icons.Snippet .. " ",
-      String = icons.String .. " ",
-      Struct = icons.Struct .. " ",
-      Text = icons.Text .. " ",
-      TypeParameter = icons.TypeParameter .. " ",
-      Unit = icons.Unit .. " ",
-      Value = icons.Value .. " ",
-      Variable = icons.Variable .. " ",
-    },
-    highlight = true,
-    separator = " " .. require("util.icons").ui.ChevronRight .. " ",
-    depth_limit = 0,
-    depth_limit_indicator = "..",
-  },
-}
-
-M.setup = function()
-  local status_ok, navic = pcall(require, "nvim-navic")
-  if not status_ok then
-    return
-  end
-
-  M.create_winbar()
-  navic.setup(M.options)
-end
-
 local function isempty(s)
   return s == nil or s == ""
 end
+
+local winbar_filetype_exclude = {
+  "help",
+  "startify",
+  "dashboard",
+  "lazy",
+  "neo-tree",
+  "neogitstatus",
+  "NvimTree",
+  "Trouble",
+  "alpha",
+  "lir",
+  "Outline",
+  "spectre_panel",
+  "toggleterm",
+  "DressingSelect",
+  "Jaq",
+  "harpoon",
+  "dap-repl",
+  "dap-terminal",
+  "dapui_console",
+  "dapui_hover",
+  "lab",
+  "notify",
+  "noice",
+  "neotest-summary",
+  "ministarter",
+  "",
+}
 
 M.get_filename = function()
   local filename = vim.fn.expand("%:t")
@@ -157,7 +101,7 @@ local get_gps = function()
 end
 
 local excludes = function()
-  return vim.tbl_contains(M.options.winbar_filetype_exclude or {}, vim.bo.filetype)
+  return vim.tbl_contains(winbar_filetype_exclude or {}, vim.bo.filetype)
 end
 
 M.get_winbar = function()

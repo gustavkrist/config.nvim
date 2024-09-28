@@ -1,6 +1,7 @@
 local opts = { noremap = true, silent = true }
 
 local term_opts = { silent = true }
+local has = require("util.plugins").has
 
 -- Shorten function name
 local map = vim.keymap.set
@@ -20,6 +21,8 @@ vim.g.maplocalleader = "\\"
 
 -- Normal --
 map("n", "<leader><leader>", "<C-^>", { desc = "Go to last used buffer", silent = true })
+map("n", "<leader>c", "<cmd>bd<cr>", { desc = "Close Buffer", silent = true })
+map("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "No Highlight", silent = true })
 
 -- Better window navigation
 map("n", "<C-h>", "<C-w>h", opts)
@@ -66,10 +69,6 @@ map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result
 -- save file
 map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
--- commenting
-map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
-map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
-
 -- Quickfix
 map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 map("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
@@ -101,15 +100,20 @@ map("t", "<C-j>", "<C-\\><C-N><C-w>j", term_opts)
 map("t", "<C-k>", "<C-\\><C-N><C-w>k", term_opts)
 map("t", "<C-l>", "<C-\\><C-N><C-w>l", term_opts)
 
-map("n", "<C-t>", "<cmd>execute v:count . 'ToggleTerm'<CR>", opts)
-map("i", "<C-t>", "<Esc><cmd>ToggleTerm<CR>", opts)
-
 -- LSP
 map("n", "gI", function()
-  require("telescope.builtin").lsp_implementations({ reuse_win = true })
+  if has("telescope.nvim") then
+    require("telescope.builtin").lsp_implementations({ reuse_win = true })
+  else
+    vim.lsp.buf.implementation()
+  end
 end, { noremap = true, silent = true, desc = "Goto Implementation" })
 map("n", "gr", function()
-  require("telescope.builtin").lsp_references({ reuse_win = true })
+  if has("telescope.nvim") then
+    require("telescope.builtin").lsp_references({ reuse_win = true })
+  else
+    vim.lsp.buf.implementation()
+  end
 end, { noremap = true, silent = true, desc = "Goto References" })
 map("n", "gl", function()
   local float = vim.diagnostic.config().float
@@ -127,10 +131,54 @@ map(
   { noremap = true, silent = true, desc = "Show Signature Help" }
 )
 map("n", "gd", function()
-  require("telescope.builtin").lsp_definitions({ reuse_win = true })
+  if has("telescope.nvim") then
+    require("telescope.builtin").lsp_definitions({ reuse_win = true })
+  else
+    vim.lsp.buf.implementation()
+  end
 end, { noremap = true, silent = true, desc = "Goto Definition" })
 map("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { noremap = true, silent = true, desc = "Goto Declaration" })
 map("n", "gh", "<cmd>lua vim.lsp.buf.hover()<cr>", { noremap = true, silent = true })
 map("n", "gy", function()
-  require("telescope.builtin").lsp_type_definitions({ reuse_win = true })
+  if has("telescope.nvim") then
+    require("telescope.builtin").lsp_type_definitions({ reuse_win = true })
+  else
+    vim.lsp.buf.implementation()
+  end
 end, { noremap = true, silent = true })
+map("n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code Action", silent = true, noremap = true })
+map("n", "<leader>li", "<cmd>LspInfo<cr>", { desc = "Info", silent = true, noremap = true })
+map(
+  "n",
+  "<leader>lj",
+  "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>",
+  { desc = "Next Diagnostic", silent = true, noremap = true }
+)
+map(
+  "n",
+  "<leader>lk",
+  "<cmd>lua vim.lsp.diagnostic.goto_prev()<cr>",
+  { desc = "Prev Diagnostic", silent = true, noremap = true }
+)
+map("n", "<leader>ll", "<cmd>lua vim.lsp.codelens.run()<cr>", { desc = "CodeLens Action", silent = true, noremap = true })
+map("n", "<leader>lq", "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>",
+  { desc = "Quickfix", silent = true, noremap = true })
+map("n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", { desc = "Rename", silent = true, noremap = true })
+
+-- Commenting
+map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
+map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+map("n", "<leader>/", "gcc", { desc = "Toggle Comment", silent = true, remap = true })
+map("v", "<leader>/", "gc", { desc = "Toggle Comment", silent = true, remap = true })
+
+-- Toggles
+require("util.plugins").on_very_lazy(function()
+  local toggle = require("util.toggle")
+  toggle.map("<leader>ud", toggle.diagnostics)
+  toggle.map("<leader>us", toggle("spell", { name = "Spelling" }))
+  toggle.map("<leader>uw", toggle("wrap", { name = "Wrap" }))
+  toggle.map("<leader>wm", toggle.maximize)
+  if vim.lsp.inlay_hint then
+    toggle.map("<leader>uh", toggle.inlay_hints)
+  end
+end)

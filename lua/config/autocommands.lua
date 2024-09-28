@@ -1,18 +1,3 @@
--- Sessions
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-  callback = function()
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      -- Don't save while there's any 'nofile' buffer open.
-      if vim.api.nvim_get_option_value("buftype", { buf = buf }) == "nofile" then
-        return
-      end
-    end
-    if vim.v.this_session ~= "" then
-      require("mini.sessions").write()
-    end
-  end,
-})
-
 -- Big files
 vim.filetype.add({
   pattern = {
@@ -23,7 +8,7 @@ vim.filetype.add({
             and path
             and vim.fn.getfsize(path) > (1024 * 1024 * 1.5) -- 1.5MB
             and "bigfile"
-          or nil
+            or nil
       end,
     },
   },
@@ -57,6 +42,32 @@ local definitions = {
         local current_tab = vim.fn.tabpagenr()
         vim.cmd("tabdo wincmd =")
         vim.cmd("tabnext " .. current_tab)
+      end,
+    },
+  },
+  {
+    "VimEnter",
+    {
+      callback = function(args)
+        local sessions_ok, mini_sessions = pcall(require, "mini.sessions")
+        if not sessions_ok then
+          return
+        end
+        local buftype = vim.api.nvim_get_option_value("buftype", { buf = args.buf })
+        if vim.fn.expand("%") == "Starter" and buftype == "nofile" then
+          require("util.git").set_git_session_global()
+          local function wait()
+            if vim.g.git_session_name == nil then
+              vim.defer_fn(wait, 50)
+              return
+            end
+            if vim.g.git_session_name ~= "" then
+              mini_sessions.read(vim.g.git_session_name)
+            end
+            vim.g.git_session_name = nil
+          end
+          vim.defer_fn(wait, 50)
+        end
       end,
     },
   },
@@ -112,28 +123,6 @@ local definitions = {
       end,
     },
   },
-  {
-    "VimEnter",
-    {
-      callback = function(args)
-        local buftype = vim.api.nvim_get_option_value("buftype", { buf = args.buf })
-        if vim.fn.expand("%") == "Starter" and buftype == "nofile" then
-          require("util.git").set_git_session_global()
-          local function wait()
-            if vim.g.git_session_name == nil then
-              vim.defer_fn(wait, 50)
-              return
-            end
-            if vim.g.git_session_name ~= "" then
-              require("mini.sessions").read(vim.g.git_session_name)
-            end
-            vim.g.git_session_name = nil
-          end
-          vim.defer_fn(wait, 50)
-        end
-      end,
-    },
-  },
   { -- taken from AstroNvim
     "BufEnter",
     {
@@ -166,29 +155,39 @@ local definitions = {
     },
   },
   {
-    { "BufWritePost", "BufRead" },
+    "Colorscheme",
     {
-      pattern = { "*.js", "*.py", "*.vue" },
+      pattern = { "nord" },
       callback = function()
-        require("lint").try_lint()
+        vim.cmd([[
+        hi @markup.heading.1.markdown guifg=#D08770
+        hi RenderMarkdownH1Bg guifg=#D08770 guibg=#3d3c44
+        hi @markup.heading.2.markdown guifg=#EBCB8B
+        hi RenderMarkdownH2Bg guifg=#EBCB8B guibg=#3f4247
+        hi @markup.heading.3.markdown guifg=#A3BE8C
+        hi RenderMarkdownH3Bg guifg=#A3BE8C guibg=#394147
+        hi @markup.heading.4.markdown guifg=#81A1C1
+        hi RenderMarkdownH4Bg guifg=#81A1C1 guibg=#363e4c
+        hi @markup.heading.5.markdown guifg=#B48EAD
+        hi RenderMarkdownH5Bg guifg=#B48EAD guibg=#3a3c4a
+        hi @markup.heading.6.markdown guifg=#D8DEE9
+        hi RenderMarkdownH6Bg guifg=#D8DEE9 guibg=#3d434f
+        hi! link NoiceLspProgressTitle @comment
+        ]])
       end,
-    },
+    }
   },
 }
 
 -- Taken from LunarVim
-local function define_autocmds(definitions)
-  for _, entry in ipairs(definitions) do
-    local event = entry[1]
-    local opts = entry[2]
-    if type(opts.group) == "string" and opts.group ~= "" then
-      local exists, _ = pcall(vim.api.nvim_get_autocmds, { group = opts.group })
-      if not exists then
-        vim.api.nvim_create_augroup(opts.group, {})
-      end
+for _, entry in ipairs(definitions) do
+  local event = entry[1]
+  local opts = entry[2]
+  if type(opts.group) == "string" and opts.group ~= "" then
+    local exists, _ = pcall(vim.api.nvim_get_autocmds, { group = opts.group })
+    if not exists then
+      vim.api.nvim_create_augroup(opts.group, {})
     end
-    vim.api.nvim_create_autocmd(event, opts)
   end
+  vim.api.nvim_create_autocmd(event, opts)
 end
-
-define_autocmds(definitions)

@@ -41,12 +41,9 @@ else
   -- dofile(os.getenv("LUNARVIM_RUNTIME_DIR") .. "/lvim/init.lua")
   require("config.options")
   require("config.keymap")
-  require("config.lazy")
-  require("config.colorscheme")
-  require("config.whichkey")
   require("config.autocommands")
   require("config.lsp")
-  require("config.snippets")
+  require("config.lazy")
   if vim.g.neovide then
     require("config.neovide")
   end

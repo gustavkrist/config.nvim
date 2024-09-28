@@ -1,22 +1,5 @@
 return {
   {
-    "lervag/vimtex",
-    init = function()
-      if vim.loop.os_uname().sysname == "Linux" then
-        if vim.loop.os_uname().release:match("WSL2$") ~= nil then
-          vim.g.vimtex_view_method = "general"
-          vim.g.vimtex_view_general_viewer = "sumatrapdf"
-        else
-          vim.g.vimtex_view_method = "zathura"
-        end
-      elseif vim.loop.os_uname().sysname == "Darwin" then
-        vim.g.vimtex_view_method = "skim"
-      end
-      vim.g.vimtex_format_enabled = 1
-    end,
-    -- ft = { "markdown", "tex", "latex" },
-  },
-  {
     "iamcco/markdown-preview.nvim",
     build = "cd app && npm install",
     init = function()
@@ -73,31 +56,6 @@ return {
     ft = { "markdown", "pandoc" },
   },
   {
-    "luk400/vim-jukit",
-    lazy = true,
-    ft = { "python" },
-    cond = function()
-      return os.getenv("NVIM_CONFIG_ENABLE_JUKIT") ~= nil
-    end,
-    init = function()
-      vim.g.jukit_mappings = 0
-      require("config.vim_jukit").config()
-    end,
-  },
-  {
-    "ionide/Ionide-vim",
-    init = function()
-      vim.cmd("let g:fsharp#lsp_auto_setup = 0")
-      vim.cmd("let g:fsharp#exclude_project_directories = ['paket-files']")
-    end,
-    ft = { "fsharp" },
-  },
-  {
-    "windwp/nvim-ts-autotag",
-    event = "User FileOpened",
-    opts = {},
-  },
-  {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {},
     ft = "markdown",
@@ -152,5 +110,26 @@ return {
     init = function()
       vim.g.bullets_outline_levels = { "ROM", "ABC", "num", "abc", "rom", "std-" }
     end,
+    ft = "markdown",
+  },
+  {
+    "jmbuhr/otter.nvim",
+    config = function(_, opts)
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        pattern = "markdown",
+        callback = function()
+          vim.keymap.set("n", "<leader>oa", function()
+            require("otter").activate()
+          end, { desc = "Activate otter", buffer = 0 })
+          vim.keymap.set("n", "<leader>od", function()
+            require("otter").deactivate()
+          end, { desc = "Deactivate otter", buffer = 0 })
+        end
+      })
+      require("otter").setup(opts)
+    end,
+    opts = {},
+    version = "*",
+    ft = { "markdown" },
   },
 }
