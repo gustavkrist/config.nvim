@@ -142,6 +142,11 @@ return {
         end,
         desc = "Dismiss All Notifications",
       },
+      {
+        "<leader>sn",
+        "<cmd>lua require('telescope').extensions.notify.notify(require('telescope.themes').get_dropdown({previewer = false}))<cr>",
+        desc = "Search notifications",
+      },
     },
     opts = {
       stages = "static",

@@ -66,6 +66,25 @@ return {
   {
     "epwalsh/obsidian.nvim",
     ft = "markdown",
+    config = function(_, opts)
+      local function paste_image()
+        vim.ui.input({
+          prompt = "Image name",
+          default = string.format("pasted-image-%s", os.time())
+        }, function(input)
+          local cur_dir = vim.api.nvim_buf_get_name(0):match("(.*)/")
+          local path = vim.fs.joinpath(cur_dir, "attachments", input)
+          vim.cmd(string.format("ObsidianPasteImg %s", path))
+        end)
+      end
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function()
+          vim.keymap.set("n", "<leader>op", paste_image, { desc = "Paste image from clipboard", buffer = 0 })
+        end
+      })
+      require("obsidian").setup(opts)
+    end,
     opts = {
       workspaces = {
         {
@@ -77,6 +96,13 @@ return {
       ui = {
         enable = false,
       },
+      attachments = {
+        confirm_img_paste = false,
+        img_text_func = function(client, path)
+          path = client:vault_relative_path(path) or path
+          return string.format("![[%s]]", path.name)
+        end,
+      }
     },
   },
   {
