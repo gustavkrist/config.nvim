@@ -7,14 +7,26 @@ return {
     config = function(_, opts)
       require("luasnip.loaders.from_lua").lazy_load({ paths = "./lua/luasnippets" })
       -- require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip").filetype_extend("latex", { "tex" })
       require("luasnip").setup(opts)
     end,
-    opts = {
-      enable_autosnippets = true,
-    },
+    opts = function()
+      return {
+        enable_autosnippets = true,
+        store_selection_keys = "<Tab>",
+        ft_func = require("luasnip.extras.filetype_functions").from_pos_or_filetype,
+        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
+          markdown = { "tex", "sql" },
+        }),
+      }
+    end,
     version = "v2.*",
     build = "make install_jsregexp",
     event = "InsertEnter",
+    keys = {
+      { "<C-n>", "<Plug>luasnip-next-choice", mode = "i" },
+      { "<C-p>", "<Plug>luasnip-prev-choice", mode = "i" },
+    },
   },
   {
     "hrsh7th/nvim-cmp",

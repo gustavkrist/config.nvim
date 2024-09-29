@@ -1,36 +1,29 @@
-local s = require("luasnip").snippet
+local ls = require("luasnip")
+-- some shorthands...
+local s = ls.snippet
+local sn = ls.snippet_node
+local t = ls.text_node
+local i = ls.insert_node
+local f = ls.function_node
+local c = ls.choice_node
+local d = ls.dynamic_node
+local r = ls.restore_node
+local l = require("luasnip.extras").lambda
+local rep = require("luasnip.extras").rep
+local p = require("luasnip.extras").partial
+local m = require("luasnip.extras").match
+local n = require("luasnip.extras").nonempty
+local dl = require("luasnip.extras").dynamic_lambda
+local fmt = require("luasnip.extras.fmt").fmt
+local fmta = require("luasnip.extras.fmt").fmta
+local types = require("luasnip.util.types")
+local conds = require("luasnip.extras.expand_conditions")
 
-local in_codeblock = require("util.treesitter").in_codeblock
+local snippets = {
+}
 
-local function in_sql_block()
-  return in_codeblock({ "sql", "SQL", "PostgreSQL" })
-end
+local autosnippets = {
+}
 
-local sql_definitions = require("luasnippets.definitions.sql")
-local tex_definitions = require("luasnippets.definitions.tex")
-
-local snippets = {}
-local autosnippets = {}
-
-for _, def in ipairs(sql_definitions.snippets) do
-  local context, nodes, opts = unpack(def)
-  opts = opts or {}
-  opts.condition = in_sql_block
-  table.insert(snippets, s(context, nodes, opts))
-end
-for _, def in ipairs(sql_definitions.autosnippets) do
-  local context, nodes, opts = unpack(def)
-  opts = opts or {}
-  opts.condition = in_sql_block
-  table.insert(autosnippets, s(context, nodes, opts))
-end
-
-for _, def in ipairs(tex_definitions.snippets) do
-  table.insert(snippets, s(unpack(def)))
-end
-for _, def in ipairs(tex_definitions.autosnippets) do
-  table.insert(autosnippets, s(unpack(def)))
-end
-
-
-return snippets, autosnippets
+ls.add_snippets('markdown', snippets, { key = "markdown_auto" })
+ls.add_snippets('markdown', autosnippets, { type = "autosnippets", key = "markdown_auto" })
