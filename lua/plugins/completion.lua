@@ -1,18 +1,17 @@
 return {
   {
     "L3MON4D3/LuaSnip",
-    dependencies = {
-      { "rafamadriz/friendly-snippets", lazy = true },
-    },
-    config = function()
-      require("luasnip").filetype_extend("rmd", { "tex" })
-      require("luasnip").filetype_extend("md", { "tex" })
-      require("luasnip").filetype_extend("markdown", { "tex" })
-      require("luasnip").filetype_extend("pandoc", { "tex" })
-      require("luasnip").filetype_extend("pandoc", { "markdown" })
-      require("luasnip.loaders.from_lua").lazy_load()
-      require("luasnip.loaders.from_vscode").lazy_load()
+    -- dependencies = {
+    --   { "rafamadriz/friendly-snippets", lazy = true },
+    -- },
+    config = function(_, opts)
+      require("luasnip.loaders.from_lua").lazy_load({ paths = "./lua/luasnippets" })
+      -- require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip").setup(opts)
     end,
+    opts = {
+      enable_autosnippets = true,
+    },
     version = "v2.*",
     build = "make install_jsregexp",
     event = "InsertEnter",
@@ -163,10 +162,10 @@ return {
               luasnip.expand_or_jump()
             elseif cmp.visible() then
               cmp.select_next_item()
-            elseif cmp_util.jumpable(1) then
-              luasnip.jump(1)
-            elseif vim.bo.filetype == "tex" then
-              cmp_util.seek_delim(fallback)
+            -- elseif cmp_util.jumpable(1) then
+            --   luasnip.jump(1)
+            -- elseif vim.bo.filetype == "tex" then
+            --   cmp_util.seek_delim(fallback)
             elseif cmp_util.has_words_before() then
               cmp.complete()
             else

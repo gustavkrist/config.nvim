@@ -18,6 +18,7 @@ local fmt = require("luasnip.extras.fmt").fmt
 local fmta = require("luasnip.extras.fmt").fmta
 local types = require("luasnip.util.types")
 local conds = require("luasnip.extras.expand_conditions")
+local events = require("luasnip.util.events")
 
 local in_mathzone = require("util.treesitter").in_mathzone
 
@@ -26,9 +27,9 @@ local function not_in_mathzone()
 end
 
 local function enable_matrix_bindings()
-  vim.api.nvim_set_keymap("i", "<Tab>", " & ", { noremap = true })
-  vim.api.nvim_set_keymap("i", "<CR>", " \\\\<CR>", { noremap = true })
-  vim.api.nvim_set_keymap("i", "<ESC>", "", {
+  vim.keymap.set("i", "<Tab>", " & ", { noremap = true, buffer = 0 })
+  vim.keymap.set("i", "<CR>", " \\\\<CR>", { noremap = true, buffer = 0 })
+  vim.keymap.set("i", "<ESC>", "", {
     noremap = 1,
     nowait = 0,
     callback = function()
@@ -37,13 +38,14 @@ local function enable_matrix_bindings()
     script = 0,
     silent = 1,
     expr = 0,
+    buffer = 0,
   })
 end
 
 local function disable_matrix_bindings()
-  vim.api.nvim_del_keymap("i", "<Tab>")
-  vim.api.nvim_del_keymap("i", "<CR>")
-  vim.api.nvim_del_keymap("i", "<ESC>")
+  vim.keymap.del("i", "<Tab>", { buffer = 0 })
+  vim.keymap.del("i", "<CR>", { buffer = 0 })
+  vim.keymap.del("i", "<ESC>", { buffer = 0 })
 end
 
 local function expand_surrounding_delims()
@@ -61,10 +63,6 @@ local function expand_surrounding_delims()
   end
   vim.api.nvim_win_set_cursor(0, cursor)
 end
-
-ls.config.set_config({
-  enable_autosnippets = true,
-})
 
 local greek = {
   alpha = "alpha",
@@ -212,30 +210,34 @@ end
 
 local autosnippets = {
   -- Math fields
-  s({
-    trig = "mk",
-    name = "Inline Math",
-  }, {
-    t("$"),
-    i(1),
-    t("$"),
-  }, {
-    condition = not_in_mathzone,
-  }),
-  s({
-    trig = "dm",
-    name = "Display Math",
-  }, {
-    t({ "$$", "" }),
-    i(0),
-    t({ "", "$$" }),
-  }, {
-    condition = not_in_mathzone,
-  }),
+  {
+    {
+      trig = "mk",
+      name = "Inline Math",
+    },
+    {
+      t("$"),
+      i(1),
+      t("$"),
+    },
+    { condition = not_in_mathzone }
+  },
+  {
+    {
+      trig = "dm",
+      name = "Display Math",
+    },
+    {
+      t({ "$$", "" }),
+      i(0),
+      t({ "", "$$" }),
+    },
+    { condition = not_in_mathzone },
+  },
 
   -- Greek letters and symbols
 
-  s(
+  {
     {
       trig = "([^\\])(%a+)",
       name = "Greek letters/symbols",
@@ -245,11 +247,9 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. "\\" .. snip.captures[2]
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "^(%a+)",
       name = "Greek letters/symbols start of line",
@@ -258,14 +258,12 @@ local autosnippets = {
     f(function(_, snip)
       return "\\" .. snip.captures[1]
     end, {}),
-    {
-      condition = is_greek_or_symbol_1,
-    }
-  ),
+    { condition = is_greek_or_symbol_1 },
+  },
 
   -- Space after greek letters and symbols, etc.
 
-  s(
+  {
     {
       trig = "(\\)(%a+)(%a)",
       name = "Greek letters/symbols space",
@@ -275,11 +273,9 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. snip.captures[2] .. " " .. snip.captures[3]
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) sr",
       name = "Greek letters/symbols squared",
@@ -289,11 +285,9 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. snip.captures[2] .. "^{2}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) cb",
       name = "Greek letters/symbols cubed",
@@ -303,25 +297,25 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. snip.captures[2] .. "^{3}"
     end, {}),
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s({
-    trig = "(\\)(%a+) rd",
-    name = "Greek letters/symbols exponent",
-    regTrig = true,
-    wordTrig = false,
-  }, {
-    f(function(_, snip)
-      return snip.captures[1] .. snip.captures[2] .. "^{"
-    end, {}),
-    i(1),
-    t("}"),
-  }, {
-    condition = is_greek_or_symbol_2,
-  }),
-  s(
+      trig = "(\\)(%a+) rd",
+      name = "Greek letters/symbols exponent",
+      regTrig = true,
+      wordTrig = false,
+    },
+    {
+      f(function(_, snip)
+        return snip.captures[1] .. snip.captures[2] .. "^{"
+      end, {}),
+      i(1),
+      t("}"),
+    },
+    { condition = is_greek_or_symbol_2 }
+  },
+  {
     {
       trig = "(\\)(%a+) hat",
       name = "Greek letters/symbols hat",
@@ -331,11 +325,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\hat{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) til",
       name = "Greek letters/symbols til",
@@ -345,11 +337,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\tilde{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) dot",
       name = "Greek letters/symbols dot",
@@ -359,11 +349,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\dot{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) ddot",
       name = "Greek letters/symbols ddot",
@@ -373,11 +361,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\ddot{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+) bar",
       name = "Greek letters/symbols bar",
@@ -387,11 +373,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\bar{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+),%.",
       name = "Greek letters/symbols matr",
@@ -401,11 +385,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\matr{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
-  s(
+    { condition = is_greek_or_symbol_2 },
+  },
+  {
     {
       trig = "(\\)(%a+)%.,",
       name = "Greek letters/symbols mathbf",
@@ -415,25 +397,25 @@ local autosnippets = {
     f(function(_, snip)
       return "\\mathbf{" .. snip.captures[1] .. snip.captures[2] .. "}"
     end, {}),
-    {
-      condition = is_greek_or_symbol_2,
-    }
-  ),
+    { condition = is_greek_or_symbol_2 },
+  },
 
   -- Operations
 
-  s({
-    trig = "bf",
-    name = "Math bold font",
-    wordTrig = false,
-  }, {
-    t("\\mathbf{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+  {
+    {
+      trig = "bf",
+      name = "Math bold font",
+      wordTrig = false,
+    },
+    {
+      t("\\mathbf{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a),%.",
       name = "Matrix symbol",
@@ -443,11 +425,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\matr{" .. snip.captures[1] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)%.,",
       name = "Math bold font",
@@ -457,99 +437,105 @@ local autosnippets = {
     f(function(_, snip)
       return "\\mathbf{" .. snip.captures[1] .. "}"
     end),
+    { condition = in_mathzone },
+  },
+  {
     {
-      condition = in_mathzone,
-    }
-  ),
-  s({
-    trig = "rm",
-    name = "Math rm",
-    wordTrig = false,
-  }, {
-    t("\\mathrm{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "opn",
-    name = "Operatorname",
-    wordTrig = false,
-  }, {
-    t("\\operatorname{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+      trig = "rm",
+      name = "Math rm",
+      wordTrig = false,
+    },
+    {
+      t("\\mathrm{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "opn",
+      name = "Operatorname",
+      wordTrig = false,
+    },
+    {
+      t("\\operatorname{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "sr",
       name = "Squared",
       wordTrig = false,
     },
     t("^{2}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "cb",
       name = "Cubed",
       wordTrig = false,
     },
     t("^{3}"),
+    { condition = in_mathzone },
+  },
+  {
     {
-      condition = in_mathzone,
-    }
-  ),
-  s({
-    trig = "rd",
-    name = "D-exponent",
-    wordTrig = false,
-  }, {
-    t("^{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "_",
-    name = "Subscript",
-    wordTrig = false,
-  }, {
-    t("_{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "sts",
-    name = "Subtext",
-    wordTrig = false,
-  }, {
-    t("_\\text{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "ee",
-    name = "E to power of",
-    wordTrig = false,
-  }, {
-    t("e^{ "),
-    i(1),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+      trig = "rd",
+      name = "D-exponent",
+      wordTrig = false,
+    },
+    {
+      t("^{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "_",
+      name = "Subscript",
+      wordTrig = false,
+    },
+    {
+      t("_{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "sts",
+      name = "Subtext",
+      wordTrig = false,
+    },
+    {
+      t("_\\text{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "ee",
+      name = "E to power of",
+      wordTrig = false,
+    },
+    {
+      t("e^{ "),
+      i(1),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)(%d)",
       name = "Auto digit subscript",
@@ -559,11 +545,9 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. "_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\matr{([\\%a]-)}(%d)",
       name = "Auto digit subscript (matr)",
@@ -573,11 +557,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\matr{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\mathbf{([\\%a]-)}(%d)",
       name = "Auto digit subscript (mathbf)",
@@ -587,11 +569,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\mathbf{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\mathrm{([\\%a]-)}(%d)",
       name = "Auto digit subscript (mathrm)",
@@ -601,11 +581,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\mathrm{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\dot{([\\%a]-)}(%d)",
       name = "Auto digit subscript (dot)",
@@ -615,11 +593,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\dot{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\ddot{([\\%a]-)}(%d)",
       name = "Auto digit subscript (ddot)",
@@ -629,11 +605,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\ddot{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\hat{([\\%a]-)}(%d)",
       name = "Auto digit subscript (hat)",
@@ -643,11 +617,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\hat{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\til{([\\%a]-)}(%d)",
       name = "Auto digit subscript (til)",
@@ -657,11 +629,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\tilde{" .. snip.captures[1] .. "}_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "([xy])([ijnm])",
       name = "Auto subscript x/y i/j/n/m",
@@ -672,11 +642,9 @@ local autosnippets = {
     f(function(_, snip)
       return snip.captures[1] .. "_{" .. snip.captures[2] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)bar",
       name = "Bar letter",
@@ -686,11 +654,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\bar{" .. snip.captures[1] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)hat",
       name = "Hat letter",
@@ -700,11 +666,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\hat{" .. snip.captures[1] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)til",
       name = "Tilde letter",
@@ -714,11 +678,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\tilde{" .. snip.captures[1] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)dot",
       name = "Dot letter",
@@ -728,11 +690,9 @@ local autosnippets = {
     f(function(_, snip)
       return "\\dot{" .. snip.captures[1] .. "}"
     end),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "(%a)ddot",
       name = "Ddot letter",
@@ -742,158 +702,158 @@ local autosnippets = {
     f(function(_, snip)
       return "\\ddot{" .. snip.captures[1] .. "}"
     end),
+    { condition = in_mathzone },
+  },
+  {
     {
-      condition = in_mathzone,
-    }
-  ),
-  s({
-    trig = "dot",
-    name = "Dot",
-    wordTrig = false,
-  }, {
-    t("\\dot{"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+      trig = "dot",
+      name = "Dot",
+      wordTrig = false,
+    },
+    {
+      t("\\dot{"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "bar",
-    name = "Bar",
-    wordTrig = false,
-  }, {
-    t("\\bar{"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "bar",
+      name = "Bar",
+      wordTrig = false,
+    },
+    {
+      t("\\bar{"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "ddot",
-    name = "Ddot",
-    wordTrig = false,
-  }, {
-    t("\\ddot{"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "ddot",
+      name = "Ddot",
+      wordTrig = false,
+    },
+    {
+      t("\\ddot{"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "matr",
-    name = "Matrix letter",
-    wordTrig = false,
-  }, {
-    t("\\matr{"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "matr",
+      name = "Matrix letter",
+      wordTrig = false,
+    },
+    {
+      t("\\matr{"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "til",
-    name = "Tilde",
-    wordTrig = false,
-  }, {
-    t("\\tilde{"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "til",
+      name = "Tilde",
+      wordTrig = false,
+    },
+    {
+      t("\\tilde{"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+        return sn(nil, i(1))
+      end),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "conj",
       name = "Conj",
       wordTrig = false,
     },
     t("^{*}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "trace",
       name = "Trace",
       wordTrig = false,
     },
     t("\\mathrm{Tr}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "det",
       name = "Det",
       wordTrig = false,
     },
     t("\\det"),
-    {
-      condition = in_mathzone,
-    }
-  ),
+    { condition = in_mathzone },
+  },
 
   -- Symbols
 
-  s(
+  {
     {
       trig = "ooo",
       name = "Infinity",
       wordTrig = false,
     },
     t("\\infty"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "sum",
       name = "Sum",
@@ -910,8 +870,8 @@ local autosnippets = {
         },
       },
     }
-  ),
-  s(
+  },
+  {
     {
       trig = "dsum",
       name = "Sum",
@@ -929,257 +889,239 @@ local autosnippets = {
         },
       },
     }
-  ),
-  s({
-    trig = "lsum",
-    name = "Sum",
-    wordTrig = false,
-    priority = 1001,
-  }, {
-    t("\\sum_{"),
-    i(1, "i=1"),
-    t("}^{"),
-    i(2, "n"),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+  },
+  {
+    {
+      trig = "lsum",
+      name = "Sum",
+      wordTrig = false,
+      priority = 1001,
     },
-  }),
-  s({
-    trig = "dlsum",
-    name = "Sum",
-    wordTrig = false,
-    priority = 1002,
-  }, {
-    t("\\displaystyle\\sum_{"),
-    i(1, "i=1"),
-    t("}^{"),
-    i(2, "n"),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+    {
+      t("\\sum_{"),
+      i(1, "i=1"),
+      t("}^{"),
+      i(2, "n"),
+      t("}"),
     },
-  }),
-  s(
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
+    }
+  },
+  {
+    {
+      trig = "dlsum",
+      name = "Sum",
+      wordTrig = false,
+      priority = 1002,
+    },
+    {
+      t("\\displaystyle\\sum_{"),
+      i(1, "i=1"),
+      t("}^{"),
+      i(2, "n"),
+      t("}"),
+    },
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
+    }
+  },
+  {
     {
       trig = "prod",
       name = "Prod",
       wordTrig = false,
     },
     t("\\prod"),
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "lim",
+      name = "Limits",
+      wordTrig = false,
+    },
+    {
+      t("\\lim_{ "),
+      i(1, "n"),
+      t(" \\to "),
+      i(2, "\\infty"),
+      t(" }"),
+    },
     {
       condition = in_mathzone,
-    }
-  ),
-  s({
-    trig = "lim",
-    name = "Limits",
-    wordTrig = false,
-  }, {
-    t("\\lim_{ "),
-    i(1, "n"),
-    t(" \\to "),
-    i(2, "\\infty"),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
       },
-    },
-  }),
-  s(
+    }
+  },
+  {
     {
       trig = "pm",
       name = "\\pm",
       wordTrig = false,
     },
     t("\\pm"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "...",
       name = "\\dots",
       wordTrig = false,
     },
     t("\\dots"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "<->",
       name = "\\leftrightarrow ",
       wordTrig = false,
     },
     t("\\leftrightarrow "),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "->",
       name = "\\to",
       wordTrig = false,
     },
     t("\\to"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "!>",
       name = "\\mapsto",
       wordTrig = false,
     },
     t("\\mapsto"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "invs",
       name = "Inverse",
       wordTrig = false,
     },
     t("^{-1}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\\\\\",
       name = "\\setminus",
       wordTrig = false,
     },
     t("\\setminus"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "||",
       name = "\\mid",
       wordTrig = false,
     },
     t("\\mid"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "and",
       name = "\\cap",
       wordTrig = false,
     },
     t("\\cap"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "orr",
       name = "\\cup",
       wordTrig = false,
     },
     t("\\cup"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "inn",
       name = "\\in",
       wordTrig = false,
     },
     t("\\in"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\subset eq",
       name = "Subset equals",
       wordTrig = false,
     },
     t("\\subseteq"),
+    { condition = in_mathzone },
+  },
+  {
     {
-      condition = in_mathzone,
-    }
-  ),
-  s({
-    trig = "set",
-    name = "Set",
-    wordTrig = false,
-  }, {
-    t("\\{ "),
-    i(1),
-    t(" \\}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+      trig = "set",
+      name = "Set",
+      wordTrig = false,
+    },
+    {
+      t("\\{ "),
+      i(1),
+      t(" \\}"),
+    },
+    { condition = in_mathzone }
+  },
+  {
     {
       trig = "=>",
       name = "\\implies",
       wordTrig = false,
     },
     t("\\implies"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "=<",
       name = "\\impliedby",
       wordTrig = false,
     },
     t("\\impliedby"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "iff",
       name = "\\iff",
       wordTrig = false,
     },
     t("\\iff"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "ex_{i}sts",
       name = "Exists",
@@ -1187,713 +1129,703 @@ local autosnippets = {
       priority = 1001,
     },
     t("\\exists"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "===",
       name = "Equivalent to",
       wordTrig = false,
     },
     t("\\equiv"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "Sq",
       name = "Square",
       wordTrig = false,
     },
     t("\\square"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "!=",
       name = "Not equals",
       wordTrig = false,
     },
     t("\\neq"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = ">=",
       name = "Greater than or equal to",
       wordTrig = false,
     },
     t("\\geq"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "<=",
       name = "Less than or equal to",
       wordTrig = false,
     },
     t("\\leq"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = ">>",
       name = "Much greater",
       wordTrig = false,
     },
     t("\\gg"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "<<",
       name = "Much lower",
       wordTrig = false,
     },
     t("\\ll"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "~~",
       name = "Similar to",
       wordTrig = false,
     },
     t("\\sim"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\sim ~",
       name = "Approximately",
       wordTrig = false,
     },
     t("\\approx"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "prop",
       name = "Proportional to",
       wordTrig = false,
     },
     t("\\propto"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "nabl",
       name = "Gradient",
       wordTrig = false,
     },
     t("\\nabla"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "del",
       name = "Gradient",
       wordTrig = false,
     },
     t("\\nabla"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "xx",
       name = "Times",
       wordTrig = false,
     },
     t("\\times"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "**",
       name = "Cdot",
       wordTrig = false,
     },
     t("\\cdot"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "pal",
       name = "Parallel to",
       wordTrig = false,
     },
     t("\\parallel"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "xp1",
       name = "x_{n+1}",
       wordTrig = false,
     },
     t("x_{n+1}"),
+    { condition = in_mathzone },
+  },
+  {
     {
-      condition = in_mathzone,
-    }
-  ),
-
-  s({
-    trig = "mcal",
-    name = "Mathcal",
-    wordTrig = false,
-  }, {
-    t("\\mathcal{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s(
+      trig = "mcal",
+      name = "Mathcal",
+      wordTrig = false,
+    },
+    {
+      t("\\mathcal{"),
+      i(1),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "ell",
       name = "Ell",
       wordTrig = false,
     },
     t("\\ell"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "lll",
       name = "Ell",
       wordTrig = false,
     },
     t("\\ell"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "LL",
       name = "\\mathcal{L}",
       wordTrig = false,
     },
     t("\\mathcal{L}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "HH",
       name = "\\mathcal{H}",
       wordTrig = false,
     },
     t("\\mathcal{H}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "CC",
       name = "\\mathbb{C}",
       wordTrig = false,
     },
     t("\\mathbb{C}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "RR",
       name = "\\mathbb{R}",
       wordTrig = false,
     },
     t("\\mathbb{R}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "ZZ",
       name = "\\mathbb{Z}",
       wordTrig = false,
     },
     t("\\mathbb{Z}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "NN",
       name = "\\mathbb{N}",
       wordTrig = false,
     },
     t("\\mathbb{N}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "II",
       name = "\\mathbb{1}",
       wordTrig = false,
     },
     t("\\mathbb{1}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "\\mathbb{1}I",
       name = "\\hat{\\mathbb{1}}",
       wordTrig = false,
     },
     t("\\hat{\\mathbb{1}}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "AA",
       name = "\\mathcal{A}",
       wordTrig = false,
     },
     t("\\mathcal{A}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "BB",
       name = "\\mathbf{B}",
       wordTrig = false,
     },
     t("\\mathbf{B}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
-  s(
+    { condition = in_mathzone },
+  },
+  {
     {
       trig = "EE",
       name = "\\mathbf{E}",
       wordTrig = false,
     },
     t("\\mathbf{E}"),
-    {
-      condition = in_mathzone,
-    }
-  ),
+    { condition = in_mathzone },
+  },
 
   -- Derivatives
 
-  s({
-    trig = "par",
-    name = "Partial",
-    wordTrig = false,
-  }, {
-    t("\\frac{ \\partial "),
-    i(1, "y"),
-    t(" }{ \\partial "),
-    i(2, "x"),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "pa2",
-    name = "Partial (2nd order)",
-    wordTrig = false,
-    priority = 1001,
-  }, {
-    t("\\frac{ \\partial^{2} "),
-    i(1, "y"),
-    t(" }{ \\partial "),
-    i(2, "x"),
-    t("^{2} }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "pa3",
-    name = "Partial (3nd order)",
-    wordTrig = false,
-    priority = 1001,
-  }, {
-    t("\\frac{ \\partial^{3} "),
-    i(1, "y"),
-    t(" }{ \\partial "),
-    i(2, "x"),
-    t("^{3} }"),
-  }, {
-    condition = in_mathzone,
-  }),
+  {
+    {
+      trig = "par",
+      name = "Partial",
+      wordTrig = false,
+    },
+    {
+      t("\\frac{ \\partial "),
+      i(1, "y"),
+      t(" }{ \\partial "),
+      i(2, "x"),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "pa2",
+      name = "Partial (2nd order)",
+      wordTrig = false,
+      priority = 1001,
+    },
+    {
+      t("\\frac{ \\partial^{2} "),
+      i(1, "y"),
+      t(" }{ \\partial "),
+      i(2, "x"),
+      t("^{2} }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "pa3",
+      name = "Partial (3nd order)",
+      wordTrig = false,
+      priority = 1001,
+    },
+    {
+      t("\\frac{ \\partial^{3} "),
+      i(1, "y"),
+      t(" }{ \\partial "),
+      i(2, "x"),
+      t("^{3} }"),
+    },
+    { condition = in_mathzone },
+  },
 
   -- Integrals
 
-  s({
-    trig = "int",
-    name = "Integral",
-    wordTrig = false,
-  }, {
-    t("\\int "),
-    i(1),
-    t(" \\diff "),
-    i(2, "x"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+  {
+    {
+      trig = "int",
+      name = "Integral",
+      wordTrig = false,
     },
-  }),
-  s({
-    trig = "lint",
-    name = "Integral",
-    wordTrig = false,
-    priority = 1001,
-  }, {
-    t("\\int_{"),
-    i(1, "-\\infty"),
-    t("}^{"),
-    i(2, "\\infty"),
-    t("} "),
-    i(3),
-    t(" \\diff "),
-    i(4, "x"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+    {
+      t("\\int "),
+      i(1),
+      t(" \\diff "),
+      i(2, "x"),
     },
-  }),
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
+    }
+  },
+  {
+    {
+      trig = "lint",
+      name = "Integral",
+      wordTrig = false,
+      priority = 1001,
+    },
+    {
+      t("\\int_{"),
+      i(1, "-\\infty"),
+      t("}^{"),
+      i(2, "\\infty"),
+      t("} "),
+      i(3),
+      t(" \\diff "),
+      i(4, "x"),
+    },
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
+    }
+  },
 
   -- Environments
 
-  s({
-    trig = "([bpBvV])mat",
-    name = "Matrix",
-    regTrig = true,
-    wordTrig = false,
-  }, {
-    f(function(_, snip)
-      return { "\\begin{" .. snip.captures[1] .. "matrix}", "" }
-    end),
-    t("\t"),
-    i(1),
-    f(function(_, snip)
-      return { "", "\\end{" .. snip.captures[1] .. "matrix}" }
-    end),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.enter] = enable_matrix_bindings,
-        [events.leave] = disable_matrix_bindings,
-      },
+  {
+    {
+      trig = "([bpBvV])mat",
+      name = "Matrix",
+      regTrig = true,
+      wordTrig = false,
     },
-  }),
-  s({
-    trig = "case",
-    name = "Case",
-    wordTrig = false,
-  }, {
-    t({ "\\begin{cases}", "" }),
-    t("\t"),
-    i(1),
-    t({ "\\end{cases}", "" }),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "align",
-    name = "Align",
-    wordTrig = false,
-  }, {
-    t({ "\\begin{align}", "" }),
-    t("\t"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+    {
+      f(function(_, snip)
+        return { "\\begin{" .. snip.captures[1] .. "matrix}", "" }
+      end),
+      t("\t"),
+      i(1),
+      f(function(_, snip)
+        return { "", "\\end{" .. snip.captures[1] .. "matrix}" }
+      end),
+    },
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.enter] = enable_matrix_bindings,
+          [events.leave] = disable_matrix_bindings,
+        },
+      },
+    }
+  },
+  {
+    {
+      trig = "case",
+      name = "Case",
+      wordTrig = false,
+    },
+    {
+      t({ "\\begin{cases}", "" }),
+      t("\t"),
+      i(1),
+      t({ "\\end{cases}", "" }),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "align",
+      name = "Align",
+      wordTrig = false,
+    },
+    {
+      t({ "\\begin{align}", "" }),
+      t("\t"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t({ "", "\\end{align}" }),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "begin",
-    name = "Environment",
-    wordTrig = false,
-  }, {
-    t("\\begin{"),
-    i(1),
-    t({ "}", "" }),
-    t("\t"),
-    d(2, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t({ "", "\\end{align}" }),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "begin",
+      name = "Environment",
+      wordTrig = false,
+    },
+    {
+      t("\\begin{"),
+      i(1),
+      t({ "}", "" }),
+      t("\t"),
+      d(2, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t({ "", "\\end{" }),
-    f(function(args)
-      return args[1][1]
-    end, { 1 }),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "array",
-    name = "Array",
-    wordTrig = false,
-  }, {
-    t({ "\\begin{array}", "" }),
-    t("\t"),
-    i(1),
-    t({ "\\end{array}", "" }),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "matrix",
-    name = "Matrix",
-    wordTrig = false,
-  }, {
-    t({ "\\begin{matrix}", "" }),
-    t("\t"),
-    i(1),
-    t({ "\\end{matrix}", "" }),
-  }, {
-    condition = in_mathzone,
-  }),
+        return sn(nil, i(1))
+      end),
+      t({ "", "\\end{" }),
+      f(function(args)
+        return args[1][1]
+      end, { 1 }),
+      t("}"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "array",
+      name = "Array",
+      wordTrig = false,
+    },
+    {
+      t({ "\\begin{array}", "" }),
+      t("\t"),
+      i(1),
+      t({ "\\end{array}", "" }),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "matrix",
+      name = "Matrix",
+      wordTrig = false,
+    },
+    {
+      t({ "\\begin{matrix}", "" }),
+      t("\t"),
+      i(1),
+      t({ "\\end{matrix}", "" }),
+    },
+    { condition = in_mathzone },
+  },
 
   -- Brackets
 
-  s({
-    trig = "lr)",
-    name = "Left/right paren",
-    wordTrig = false,
-  }, {
-    t("\\left("),
-    i(1),
-    t("\\right)"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "lr|",
-    name = "Left/right bars",
-    wordTrig = false,
-  }, {
-    t("\\left|"),
-    i(1),
-    t("\\right|"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "lr]",
-    name = "Left/right brackets",
-    wordTrig = false,
-  }, {
-    t("\\left["),
-    i(1),
-    t("\\right]"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "lr}",
-    name = "Left/right curlies",
-    wordTrig = false,
-  }, {
-    t("\\left\\{"),
-    i(1),
-    t("\\right\\}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "lr>",
-    name = "Left/right angles",
-    wordTrig = false,
-  }, {
-    t("\\left<"),
-    i(1),
-    t("\\right>"),
-  }, {
-    condition = in_mathzone,
-  }),
+  {
+    {
+      trig = "lr)",
+      name = "Left/right paren",
+      wordTrig = false,
+    },
+    {
+      t("\\left("),
+      i(1),
+      t("\\right)"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "lr|",
+      name = "Left/right bars",
+      wordTrig = false,
+    },
+    {
+      t("\\left|"),
+      i(1),
+      t("\\right|"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "lr]",
+      name = "Left/right brackets",
+      wordTrig = false,
+    },
+    {
+      t("\\left["),
+      i(1),
+      t("\\right]"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "lr}",
+      name = "Left/right curlies",
+      wordTrig = false,
+    },
+    {
+      t("\\left\\{"),
+      i(1),
+      t("\\right\\}"),
+    },
+    {
+      condition = in_mathzone,
+    }
+  },
+  {
+    {
+      trig = "lr>",
+      name = "Left/right angles",
+      wordTrig = false,
+    },
+    {
+      t("\\left<"),
+      i(1),
+      t("\\right>"),
+    },
+    { condition = in_mathzone },
+  },
 
   -- Selection based
 
-  s({
-    trig = "UB",
-    name = "Underbrace",
-    wordTrig = false,
-  }, {
-    t("\\underbrace{ "),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+  {
+    {
+      trig = "UB",
+      name = "Underbrace",
+      wordTrig = false,
+    },
+    {
+      t("\\underbrace{ "),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t(" }_{ "),
-    i(2),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "US",
-    name = "Underset",
-    wordTrig = false,
-  }, {
-    t("\\underset{ "),
-    i(1),
-    t(" }{ "),
-    d(2, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t(" }_{ "),
+      i(2),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "US",
+      name = "Underset",
+      wordTrig = false,
+    },
+    {
+      t("\\underset{ "),
+      i(1),
+      t(" }{ "),
+      d(2, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "CA",
-    name = "Cancel",
-    wordTrig = false,
-  }, {
-    t("\\cancel{ "),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "CA",
+      name = "Cancel",
+      wordTrig = false,
+    },
+    {
+      t("\\cancel{ "),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "CT",
-    name = "Cancel to",
-    wordTrig = false,
-  }, {
-    t("\\cancelto{ "),
-    i(1),
-    t(" }{ "),
-    d(2, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "CT",
+      name = "Cancel to",
+      wordTrig = false,
+    },
+    {
+      t("\\cancelto{ "),
+      i(1),
+      t(" }{ "),
+      d(2, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "sq",
-    name = "Square root",
-    wordTrig = false,
-  }, {
-    t("\\sqrt{ "),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "sq",
+      name = "Square root",
+      wordTrig = false,
+    },
+    {
+      t("\\sqrt{ "),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t(" }"),
-  }, {
-    condition = in_mathzone,
-  }),
+        return sn(nil, i(1))
+      end),
+      t(" }"),
+    },
+    { condition = in_mathzone },
+  },
 
   -- Misc
 
-  s(
+  {
     {
       trig = ":(%l)",
       name = "Vector",
@@ -1903,70 +1835,74 @@ local autosnippets = {
     f(function(_, snip)
       return "\\vec{" .. snip.captures[1] .. "}"
     end, {}),
+    { condition = in_mathzone },
+  },
+  {
+    {
+      trig = "//",
+      name = "Fraction",
+      wordTrig = false,
+    },
+    {
+      t("\\frac{"),
+      i(1),
+      t("}{"),
+      i(2),
+      t("}"),
+    },
     {
       condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
     }
-  ),
-  s({
-    trig = "//",
-    name = "Fraction",
-    wordTrig = false,
-  }, {
-    t("\\frac{"),
-    i(1),
-    t("}{"),
-    i(2),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+  },
+  {
+    {
+      trig = "([%w\\]+)/",
+      name = "Fraction",
+      regTrig = true,
+      wordTrig = false,
     },
-  }),
-  s({
-    trig = "([%w\\]+)/",
-    name = "Fraction",
-    regTrig = true,
-    wordTrig = false,
-  }, {
-    t("\\frac{"),
-    f(function(_, snip)
-      return snip.captures[1]
-    end),
-    t("}{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-    callbacks = {
-      [-1] = {
-        [events.leave] = function()
-          vim.defer_fn(expand_surrounding_delims, 100)
-        end,
-      },
+    {
+      t("\\frac{"),
+      f(function(_, snip)
+        return snip.captures[1]
+      end),
+      t("}{"),
+      i(1),
+      t("}"),
     },
-  }),
+    {
+      condition = in_mathzone,
+      callbacks = {
+        [-1] = {
+          [events.leave] = function()
+            vim.defer_fn(expand_surrounding_delims, 100)
+          end,
+        },
+      },
+    }
+  },
 }
 
 -- At signs
 for k, v in pairs(at_signs) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = k,
         name = v,
         wordTrig = false,
       },
       t(v),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
@@ -1974,7 +1910,7 @@ end
 for k, _ in pairs(degree_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "([^\\])(" .. k .. ")",
         name = k,
@@ -1984,17 +1920,15 @@ for k, _ in pairs(degree_functions) do
       f(function(_, snip)
         return snip.captures[1] .. "\\" .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 for k, _ in pairs(arc_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "([^\\])(" .. k .. ")",
         name = k,
@@ -2005,17 +1939,15 @@ for k, _ in pairs(arc_functions) do
       f(function(_, snip)
         return snip.captures[1] .. "\\" .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 for k, _ in pairs(degree_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "^(" .. k .. ")",
         name = k .. " (Start of line)",
@@ -2025,17 +1957,15 @@ for k, _ in pairs(degree_functions) do
       f(function(_, snip)
         return "\\" .. snip.captures[1]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 for k, _ in pairs(arc_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "^(" .. k .. ")",
         name = k .. " (Start of line)",
@@ -2046,71 +1976,82 @@ for k, _ in pairs(arc_functions) do
       f(function(_, snip)
         return "\\" .. snip.captures[1]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 local non_autosnippets = {
-  s({
-    trig = "te",
-    name = "Text env",
-    wordTrig = false,
-  }, {
-    t("\\text{"),
-    i(1),
-    t("}"),
-  }, {
-    condition = in_mathzone,
-  }),
-  s({
-    trig = "begin",
-    name = "Environment (not auto)",
-    wordTrig = false,
-  }, {
-    t("\\begin{"),
-    i(1),
-    t({ "}", "" }),
-    t("\t"),
-    d(2, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+  {
+    {
+      trig = "te",
+      name = "Text env",
+      wordTrig = false,
+    },
+    {
+      t("\\text{"),
+      i(1),
+      t("}"),
+    },
+    {
+      condition = in_mathzone,
+      show_condition = in_mathzone,
+    }
+  },
+  {
+    {
+      trig = "begin",
+      name = "Environment (not auto)",
+      wordTrig = false,
+    },
+    {
+      t("\\begin{"),
+      i(1),
+      t({ "}", "" }),
+      t("\t"),
+      d(2, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t({ "", "\\end{" }),
-    f(function(args)
-      return args[1][1]
-    end, { 1 }),
-    t("}"),
-  }),
-  s({
-    trig = "aligns",
-    name = "Align*",
-    wordTrig = true,
-  }, {
-    t({ "\\begin{align*}", "" }),
-    t("\t"),
-    d(1, function(_, snip)
-      local res, env = {}, snip.env
-      if env.LS_SELECT_RAW[1] ~= nil then
-        for _, ele in ipairs(env.LS_SELECT_RAW) do
-          table.insert(res, ele)
+        return sn(nil, i(1))
+      end),
+      t({ "", "\\end{" }),
+      f(function(args)
+        return args[1][1]
+      end, { 1 }),
+      t("}"),
+    }
+  },
+  {
+    {
+      trig = "aligns",
+      name = "Align*",
+      wordTrig = true,
+    },
+    {
+      t({ "\\begin{align*}", "" }),
+      t("\t"),
+      d(1, function(_, snip)
+        local res, env = {}, snip.env
+        if env.LS_SELECT_RAW[1] ~= nil then
+          for _, ele in ipairs(env.LS_SELECT_RAW) do
+            table.insert(res, ele)
+          end
+          return sn(nil, t(res))
         end
-        return sn(nil, t(res))
-      end
-      return sn(nil, i(1))
-    end),
-    t({ "", "\\end{align*}" }),
-  }, {
-    condition = not_in_mathzone,
-  }),
+        return sn(nil, i(1))
+      end),
+      t({ "", "\\end{align*}" }),
+    },
+    {
+      condition = not_in_mathzone,
+      show_condition = not_in_mathzone,
+    }
+  },
 }
 
 -- Add space after degree function, except for h
@@ -2118,7 +2059,7 @@ local non_autosnippets = {
 for k, _ in pairs(degree_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "(\\" .. k .. ")([^h%A])",
         name = k,
@@ -2128,17 +2069,15 @@ for k, _ in pairs(degree_functions) do
       f(function(_, snip)
         return snip.captures[1] .. " " .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 for k, _ in pairs(arc_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "(\\" .. k .. ")([^h%A])",
         name = k,
@@ -2148,10 +2087,8 @@ for k, _ in pairs(arc_functions) do
       f(function(_, snip)
         return snip.captures[1] .. " " .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
@@ -2160,7 +2097,7 @@ end
 for k, _ in pairs(degree_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "(\\" .. k .. "h)(%a)",
         name = k,
@@ -2170,17 +2107,15 @@ for k, _ in pairs(degree_functions) do
       f(function(_, snip)
         return snip.captures[1] .. " " .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
 for k, _ in pairs(arc_functions) do
   table.insert(
     autosnippets,
-    s(
+    {
       {
         trig = "(\\" .. k .. "h)(%a)",
         name = k,
@@ -2190,18 +2125,14 @@ for k, _ in pairs(arc_functions) do
       f(function(_, snip)
         return snip.captures[1] .. " " .. snip.captures[2]
       end),
-      {
-        condition = in_mathzone,
-      }
-    )
+      { condition = in_mathzone },
+    }
   )
 end
 
-ls.add_snippets("tex", autosnippets, {
-  type = "autosnippets",
-  key = "tex_auto",
-})
+local M = {}
 
-ls.add_snippets("tex", non_autosnippets, {
-  key = "tex",
-})
+M.snippets = non_autosnippets
+M.autosnippets = autosnippets
+
+return M

@@ -19,11 +19,11 @@ local MATH_NODES = {
   inline_formula = true,
 }
 
-local function get_node_at_cursor()
+local function get_node_at_cursor(lang)
   local cursor = vim.api.nvim_win_get_cursor(0)
   local cursor_range = { cursor[1] - 1, cursor[2] }
   local buf = vim.api.nvim_get_current_buf()
-  local ok, parser = pcall(ts.get_parser, buf, "latex")
+  local ok, parser = pcall(ts.get_parser, buf, lang)
   if not ok or not parser then
     return
   end
@@ -37,24 +37,11 @@ local function get_node_at_cursor()
   return root:named_descendant_for_range(cursor_range[1], cursor_range[2], cursor_range[1], cursor_range[2])
 end
 
-function M.in_comment()
-  if has_treesitter then
-    local node = get_node_at_cursor()
-    while node do
-      if node:type() == "comment" then
-        return true
-      end
-      node = node:parent()
-    end
-    return false
-  end
-end
-
 -- https://github.com/nvim-treesitter/nvim-treesitter/issues/1184#issuecomment-830388856
 function M.in_mathzone()
   if has_treesitter then
     local buf = vim.api.nvim_get_current_buf()
-    local node = get_node_at_cursor()
+    local node = get_node_at_cursor("latex")
     while node do
       if MATH_NODES[node:type()] then
         return true
@@ -68,6 +55,55 @@ function M.in_mathzone()
       node = node:parent()
     end
     return false
+  end
+end
+
+function M.in_comment()
+  if has_treesitter then
+    local node = ts.get_node({ignore_injections = false})
+    while node and (node:type() ~= "comment") do
+      node = node:parent()
+    end
+    return node ~= nil
+  end
+end
+
+function M.in_codeblock(lang)
+  if has_treesitter then
+    local buf = vim.api.nvim_get_current_buf()
+    local node = ts.get_node()
+    while node and (node:type() ~= "fenced_code_block") do
+      node = node:parent()
+    end
+    if not node then
+      return false
+    end
+    local info_node = nil
+    for child in node:iter_children() do
+      if child:type() == "info_string" then
+        info_node = child
+      end
+    end
+    if not info_node then
+      return false
+    end
+    local lang_node = nil
+    for child in info_node:iter_children() do
+      if child:type() == "language" then
+      lang_node = child
+      end
+    end
+    if not lang_node then
+      return false
+    end
+    local code_block_lang = ts.get_node_text(lang_node, buf)
+    if type(lang) == "string" then
+      return code_block_lang:lower() == lang:lower()
+    end
+    if type(lang) == "table" then
+      return vim.tbl_contains(lang, code_block_lang:lower())
+    end
+    return true
   end
 end
 

@@ -193,6 +193,12 @@ return {
           },
           view = "mini",
         },
+        {
+          filter = {
+            event = "msg_showmode",
+          },
+          view = "mini",
+        },
       },
       presets = {
         bottom_search = true,
