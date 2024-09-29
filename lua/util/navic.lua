@@ -35,7 +35,7 @@ local winbar_filetype_exclude = {
   "",
 }
 
-M.get_filename = function()
+function M.get_filename()
   local filename = vim.fn.expand("%:t")
   local extension = vim.fn.expand("%:e")
 
@@ -104,7 +104,7 @@ local excludes = function()
   return vim.tbl_contains(winbar_filetype_exclude or {}, vim.bo.filetype)
 end
 
-M.get_winbar = function()
+function M.get_winbar()
   if excludes() then
     return
   end
@@ -141,7 +141,7 @@ M.get_winbar = function()
   end
 end
 
-M.create_winbar = function()
+function M.create_winbar()
   vim.api.nvim_create_augroup("_winbar", {})
   vim.api.nvim_create_autocmd({
     "CursorHoldI",
