@@ -19,30 +19,7 @@ return {
           manual_install = true
         },
         jsonls = true,
-        lua_ls = {
-          settings = {
-            Lua = {
-              diagnostics = {
-                globals = { "vim" },
-              },
-            },
-          },
-          on_init = function(client)
-            local path = client.workspace_folders[1].name
-            if not vim.loop.fs_stat(path .. "/.luarc.json") and not vim.loop.fs_stat(path .. "/.luarc.jsonc") then
-              client.config.settings = vim.tbl_deep_extend("force", client.config.settings.Lua, {
-                runtime = {
-                  version = "LuaJIT",
-                },
-                workspace = {
-                  library = { vim.env.VIMRUNTIME },
-                },
-              })
-              client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
-            end
-            return true
-          end,
-        },
+        lua_ls = true,
         pyright = true,
         texlab = true,
         ts_ls = {
@@ -186,7 +163,8 @@ return {
             node_decremental = "<bs>",
           },
         },
-        indent = { enable = true }, disable = { "yaml", "python" },
+        indent = { enable = true },
+        disable = { "yaml", "python" },
         context_commentstring = {
           enable = true,
           enable_autocmd = false,
@@ -437,4 +415,24 @@ return {
     end,
     event = "User FileOpened",
   },
+  {
+    {
+      "folke/lazydev.nvim",
+      ft = "lua",
+      opts = {},
+    },
+  },
+  {
+    "danymat/neogen",
+    opts = {
+      snippet_engine = "luasnip",
+    },
+    event = "User FileOpened",
+    keys = {
+      { "<leader>nc", "<cmd>lua require('neogen').generate({ type = 'class' })<cr>", desc = "Generate Annotations (Class)" },
+      { "<leader>nf", "<cmd>lua require('neogen').generate({ type = 'func' })<cr>",  desc = "Generate Annotations (Function)" },
+      { "<leader>nt", "<cmd>lua require('neogen').generate({ type = 'type' })<cr>",  desc = "Generate Annotations (Type)" },
+      { "<leader>nF", "<cmd>lua require('neogen').generate({ type = 'file' })<cr>",  desc = "Generate Annotations (File)" },
+    }
+  }
 }

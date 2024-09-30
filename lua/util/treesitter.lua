@@ -3,6 +3,7 @@
 
 local has_treesitter, ts = pcall(require, "vim.treesitter")
 
+---@class util.treesitter
 local M = {}
 
 local MATH_ENVIRONMENTS = {
@@ -68,6 +69,7 @@ function M.in_comment()
   end
 end
 
+---@param lang? string|string[]
 function M.in_codeblock(lang)
   if has_treesitter then
     local buf = vim.api.nvim_get_current_buf()

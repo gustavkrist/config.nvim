@@ -1,3 +1,4 @@
+---@class util.git
 local M = {}
 
 local Job = require("plenary.job")
@@ -58,6 +59,8 @@ function M.set_git_session_global()
   }):start()
 end
 
+--- Open picker for branch/commit and run vim function `fn` with picked value as argument
+---@param fn string
 function M.run_openingh_with_picked_ref(fn)
   local branches = vim.fn.systemlist("git rev-parse --abbrev-ref origin/HEAD HEAD")
   local default = vim.fs.basename(branches[1])

@@ -27,19 +27,9 @@ local function not_in_mathzone()
 end
 
 local function enable_matrix_bindings()
-  vim.keymap.set("i", "<Tab>", " & ", { noremap = true, buffer = 0 })
-  vim.keymap.set("i", "<CR>", " \\\\<CR>", { noremap = true, buffer = 0 })
-  vim.keymap.set("i", "<ESC>", "", {
-    noremap = 1,
-    nowait = 0,
-    callback = function()
-      require("luasnip").expand_or_jump()
-    end,
-    script = 0,
-    silent = 1,
-    expr = 0,
-    buffer = 0,
-  })
+  vim.keymap.set("i", "<Tab>", " & ", { noremap = true, silent = true, buffer = 0 })
+  vim.keymap.set("i", "<CR>", " \\\\<CR>", { noremap = true, silent = true, buffer = 0 })
+  vim.keymap.set("i", "<ESC>", require("luasnip").expand_or_jump, { noremap = true, silent = true, buffer = 0 })
 end
 
 local function disable_matrix_bindings()

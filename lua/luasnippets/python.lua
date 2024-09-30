@@ -20,54 +20,16 @@ local fmta = require("luasnip.extras.fmt").fmta
 local types = require("luasnip.util.types")
 local conds = require("luasnip.extras.expand_conditions")
 
-local snippets = {
-  s(
-    {
-      trig = "aligns",
-      name = "Align*",
-      wordTrig = true,
-    },
-    {
-      t({ "\\begin{align*}", "" }),
-      t("\t"),
-      d(1, function(_, snip)
-        local res, env = {}, snip.env
-        if env.LS_SELECT_RAW[1] ~= nil then
-          for _, ele in ipairs(env.LS_SELECT_RAW) do
-            table.insert(res, ele)
-          end
-          return sn(nil, t(res))
-        end
-        return sn(nil, i(1))
-      end),
-      t({ "", "\\end{align*}" }),
-    }
-  ),
-}
+local snippets = {}
 
 local autosnippets = {
   s(
     {
-      trig = "mk",
-      name = "Inline Math",
+      trig = "ifmain",
+      condition = conds.line_begin,
     },
-    {
-      t("$"),
-      i(1),
-      t("$"),
-    }
-  ),
-  s(
-    {
-      trig = "dm",
-      name = "Display Math",
-    },
-    {
-      t({ "$$", "" }),
-      i(0),
-      t({ "", "$$" }),
-    }
-  ),
+    t({'if __name__ == "__main__":', "    main()"})
+  )
 }
 
 return snippets, autosnippets

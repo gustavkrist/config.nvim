@@ -13,6 +13,9 @@ return {
         vim.g.vimtex_view_method = "skim"
       end
       vim.g.vimtex_format_enabled = 1
+      vim.g.vimtex_delim_stopline = 500
+      vim.g.vimtex_delim_timeout = 300
+      vim.g.vimtex_delim_insert_timeout = 60
     end,
   },
 }
