@@ -77,7 +77,7 @@ return {
           operators = false,   -- adds help for operators like d, y, ... and registers them for motion / text object completion
           motions = true,      -- adds help for motions
           text_objects = true, -- help for text objects triggered after entering an operator
-          windows = true,     -- default bindings on <c-w>
+          windows = true,      -- default bindings on <c-w>
           nav = false,         -- misc bindings to work with windows
           z = true,            -- bindings for folds, spelling and others prefixed with z
           g = true,            -- bindings for prefixed with g
@@ -294,7 +294,7 @@ return {
         "<cmd>lua require('gitsigns').undo_stage_hunk()<cr>",
         desc = "Undo Stage Hunk",
       },
-      { "<leader>bd", "<cmd>Gitsigns diffthis HEAD<cr>", desc = "Git Diff" },
+      { "<leader>gd", "<cmd>Gitsigns diffthis HEAD<cr>", desc = "Git Diff" },
     },
     event = "User FileOpened",
     cmd = "Gitsigns",
@@ -322,17 +322,28 @@ return {
     cmd = "ASToggle",
     event = { "InsertLeave", "TextChanged" },
     config = function()
+      local function in_config_dir(buf)
+        for dir in vim.fs.parents(vim.api.nvim_buf_get_name(buf)) do
+          if dir == (os.getenv("XDG_CONFIG_HOME") .. "/nvim") then
+            return true
+          end
+        end
+        return false
+      end
       require("auto-save").setup({
         condition = function(buf)
           local fn = vim.fn
           local utils = require("auto-save.utils.data")
-          if utils.not_in(fn.getbufvar(buf, "&filetype"), { "oil" }) then
-            return true
+          if not utils.not_in(fn.getbufvar(buf, "&filetype"), { "oil" }) then
+            return false
           end
-          return false
+          return not in_config_dir(buf)
         end,
       })
     end,
+    keys = {
+      { "<leader>at", "<cmd>ASToggle<cr>", desc = "Toggle AutoSave" },
+    },
   },
   {
     "ethanholz/nvim-lastplace",

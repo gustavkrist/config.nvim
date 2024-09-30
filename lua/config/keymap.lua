@@ -23,6 +23,7 @@ vim.g.maplocalleader = "\\"
 map("n", "<leader><leader>", "<C-^>", { desc = "Go to last used buffer", silent = true })
 map("n", "<leader>c", "<cmd>bd<cr>", { desc = "Close Buffer", silent = true })
 map("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "No Highlight", silent = true })
+map("n", "<leader>m", "<cmd>messages<cr>", { desc = "Show messages", silent = true })
 
 -- Better window navigation
 map("n", "<C-h>", "<C-w>h", opts)

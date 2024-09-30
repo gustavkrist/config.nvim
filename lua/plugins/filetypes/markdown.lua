@@ -122,8 +122,8 @@ return {
           -- vim.call("pandoc#command#Init")
           -- vim.call("pandoc#compiler#Init")
           vim.call("pandoc#folding#Init")
-          -- vim.call("pandoc#formatting#Init")
           vim.call("pandoc#keyboard#Init")
+          -- vim.call("pandoc#formatting#Init")
           -- vim.call("pandoc#spell#Init")
           vim.call("pandoc#toc#Init")
           vim.call("pandoc#yaml#Init")
@@ -156,6 +156,13 @@ return {
     end,
     opts = {},
     version = "*",
+    ft = { "markdown" },
+  },
+  {
+    "dhruvasagar/vim-table-mode",
+    init = function()
+      vim.g.table_mode_map_prefix = "<localleader>t"
+    end,
     ft = { "markdown" },
   },
 }

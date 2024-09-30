@@ -62,7 +62,7 @@ return {
   },
   {
     "windwp/nvim-ts-autotag",
-    event = "User FileOpened",
     opts = {},
+    ft = { "html", "vue" },
   },
 }

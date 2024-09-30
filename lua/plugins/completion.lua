@@ -6,7 +6,7 @@ return {
     -- },
     config = function(_, opts)
       require("luasnip.loaders.from_lua").lazy_load({
-        paths = "./lua/luasnippets",
+        paths = { "./lua/luasnippets" },
         fs_event_providers = {
           autocmd = false,
           libuv = true,
@@ -18,6 +18,7 @@ return {
       require("luasnip").setup(opts)
     end,
     opts = function()
+      local types = require("luasnip.util.types")
       return {
         enable_autosnippets = true,
         store_selection_keys = "<Tab>",
@@ -25,6 +26,18 @@ return {
         load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
           markdown = { "tex", "sql", "python", "vue" },
         }),
+        ext_opts = {
+          [types.choiceNode] = {
+            active = {
+              virt_text = {{"●", "@comment.warning"}},
+            },
+          },
+          [types.insertNode] = {
+            active = {
+              virt_text = {{"●", "@boolean"}},
+            },
+          },
+        },
       }
     end,
     version = "v2.*",
@@ -32,7 +45,11 @@ return {
     event = "InsertEnter",
     keys = {
       { "<C-n>", "<Plug>luasnip-next-choice", mode = "i" },
+      { "<C-n>", "<Plug>luasnip-next-choice", mode = "s" },
       { "<C-p>", "<Plug>luasnip-prev-choice", mode = "i" },
+      { "<C-p>", "<Plug>luasnip-prev-choice", mode = "s" },
+      { "<C-u>", "<cmd>lua require('luasnip.extras.select_choice')()<cr>", mode = "i" },
+      { "<C-u>", "<cmd>lua require('luasnip.extras.select_choice')()<cr>", mode = "s" },
       { "<leader>se", "<cmd>lua require('luasnip.loaders').edit_snippet_files()<CR>", desc = "Edit snippets" },
     },
   },
@@ -122,8 +139,8 @@ return {
           format = function(entry, vim_item)
             -- Kind icons
             icon, _, _ = require("mini.icons").get("lsp", vim_item.kind)
-            -- vim_item.kind = string.format("%s", icon)
-            vim_item.kind = string.format("%s %s", icon, vim_item.kind) -- This concatonates the icons with the name of the item kind
+            vim_item.kind = string.format("%s", icon)
+            -- vim_item.kind = string.format("%s %s", icon, vim_item.kind) -- This concatonates the icons with the name of the item kind
             vim_item.menu = ({
               nvim_lsp = "[LSP]",
               luasnip = "[Snippet]",

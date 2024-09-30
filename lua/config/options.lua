@@ -42,13 +42,14 @@ local options = {
     diff = "╱",
     eob = " ",
   },
-  formatoptions = "jcroqlnt",
   grepprg = "rg --vimgrep",
   inccommand = "nosplit", -- preview incremental substitute
   jumpoptions = "view",
   sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" },
   virtualedit = "block",
 }
+
+vim.opt.formatoptions:append({ "n" })
 
 vim.opt.shortmess:append({ W = true, I = true, c = true, C = true })
 
