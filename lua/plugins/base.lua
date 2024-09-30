@@ -14,6 +14,8 @@ return {
     opts = {
       open_mapping = "<C-t>",
       direction = "float",
+      start_in_insert = true,
+      persist_mode = false,
     },
     cmd = {
       "ToggleTerm",
@@ -25,7 +27,7 @@ return {
     },
     keys = function()
       local Terminal = require("toggleterm.terminal").Terminal
-      local lazygit = Terminal:new({ cmd = "lazygit", hidden = true })
+      local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
       local function _LAZYGIT_TOGGLE()
         lazygit:toggle()
       end

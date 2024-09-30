@@ -186,6 +186,7 @@ return {
           use_as_default_explorer = true,
         },
       })
+      require("mini.icons").setup()
       require("mini.sessions").setup()
       require("mini.splitjoin").setup()
       require("mini.starter").setup()

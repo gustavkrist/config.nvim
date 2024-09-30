@@ -5,7 +5,13 @@ return {
     --   { "rafamadriz/friendly-snippets", lazy = true },
     -- },
     config = function(_, opts)
-      require("luasnip.loaders.from_lua").lazy_load({ paths = "./lua/luasnippets" })
+      require("luasnip.loaders.from_lua").lazy_load({
+        paths = "./lua/luasnippets",
+        fs_event_providers = {
+          autocmd = false,
+          libuv = true,
+        },
+      })
       -- require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip").filetype_extend("latex", { "tex" })
       require("luasnip").filetype_extend("markdown_inline", { "markdown" })
@@ -27,16 +33,17 @@ return {
     keys = {
       { "<C-n>", "<Plug>luasnip-next-choice", mode = "i" },
       { "<C-p>", "<Plug>luasnip-prev-choice", mode = "i" },
+      { "<leader>se", "<cmd>lua require('luasnip.loaders').edit_snippet_files()<CR>", desc = "Edit snippets" },
     },
   },
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
-      { "hrsh7th/cmp-nvim-lsp",     lazy = true },
-      { "hrsh7th/cmp-buffer",       lazy = true },
-      { "hrsh7th/cmp-path",         lazy = true },
-      { "hrsh7th/cmp-cmdline",      lazy = true },
-      { "hrsh7th/cmp-nvim-lua",     lazy = true },
+      { "hrsh7th/cmp-nvim-lsp", lazy = true },
+      { "hrsh7th/cmp-buffer", lazy = true },
+      { "hrsh7th/cmp-path", lazy = true },
+      { "hrsh7th/cmp-cmdline", lazy = true },
+      { "hrsh7th/cmp-nvim-lua", lazy = true },
       { "saadparwaiz1/cmp_luasnip", lazy = true },
       "L3MON4D3/LuaSnip",
     },
@@ -68,7 +75,6 @@ return {
     opts = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
-      local kind_icons = require("util.icons").kind
       local cmp_util = require("util.cmp")
       return {
         snippet = {
@@ -113,11 +119,11 @@ return {
         formatting = {
           fields = { "kind", "abbr", "menu" },
           max_width = 0,
-          kind_icons = kind_icons,
           format = function(entry, vim_item)
             -- Kind icons
-            vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
-            -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+            icon, _, _ = require("mini.icons").get("lsp", vim_item.kind)
+            -- vim_item.kind = string.format("%s", icon)
+            vim_item.kind = string.format("%s %s", icon, vim_item.kind) -- This concatonates the icons with the name of the item kind
             vim_item.menu = ({
               nvim_lsp = "[LSP]",
               luasnip = "[Snippet]",

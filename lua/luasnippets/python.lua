@@ -20,16 +20,31 @@ local fmta = require("luasnip.extras.fmt").fmta
 local types = require("luasnip.util.types")
 local conds = require("luasnip.extras.expand_conditions")
 
-local snippets = {}
-
-local autosnippets = {
+local snippets = {
+  s({
+    trig = "lc",
+    desc = "[L]ist [c]omprehension",
+  }, fmt("[{} for {} in {}]", { i(1, "value"), i(2, "value"), i(3, "iterable") })),
   s(
     {
-      trig = "ifmain",
-      condition = conds.line_begin,
+      trig = "frl",
+      desc = "[F]or _ in [r]ange([l]en(object))",
     },
-    t({'if __name__ == "__main__":', "    main()"})
-  )
+    fmt(
+      [[
+      for {} in range(len({})):
+          {}
+    ]],
+      { i(1, "i"), i(2, "object"), i(3, "pass") }
+    )
+  ),
+}
+
+local autosnippets = {
+  s({
+    trig = "ifmain",
+    condition = conds.line_begin,
+  }, t({ 'if __name__ == "__main__":', "    main()" })),
 }
 
 return snippets, autosnippets

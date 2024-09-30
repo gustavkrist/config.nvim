@@ -128,6 +128,13 @@ local definitions = {
       end,
     },
   },
+  {
+    "BufRead",
+    {
+      pattern = "*.ipynb",
+      command = "setlocal ft=python"
+    },
+  },
 }
 
 -- Taken from LunarVim
