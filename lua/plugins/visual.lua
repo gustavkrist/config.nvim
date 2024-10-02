@@ -264,30 +264,7 @@ return {
     end,
   },
   {
-    "3rd/image.nvim",
-    dependencies = {
-      "kiyoon/magick.nvim",
-    },
-    opts = {
-      integrations = {
-        markdown = {
-          clear_in_insert_mode = true,
-          only_render_image_at_cursor = true,
-          resolve_image_path = function(document_path, image_path, fallback)
-            local direct_path = vim.fs.joinpath(document_path, image_path)
-            if vim.fn.filereadable(direct_path) == 1 then
-              return direct_path
-            end
-            local attachments_path =
-                vim.fs.joinpath(document_path:match("(.*)/"), "attachments", image_path:match("[^#|]+"))
-            if vim.fn.filereadable(attachments_path) == 1 then
-              return attachments_path
-            end
-            return fallback(document_path, image_path)
-          end,
-        },
-      },
-    },
-    ft = "markdown",
+    "MunifTanjim/nui.nvim",
+    lazy = true,
   },
 }

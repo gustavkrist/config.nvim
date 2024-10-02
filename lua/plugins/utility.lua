@@ -1,6 +1,41 @@
 local map = vim.keymap.set
 return {
   {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    opts = {
+      open_mapping = "<C-t>",
+      direction = "float",
+      start_in_insert = true,
+      persist_mode = false,
+    },
+    cmd = {
+      "ToggleTerm",
+      "TermExec",
+      "ToggleTermToggleAll",
+      "ToggleTermSendCurrentLine",
+      "ToggleTermSendVisualLines",
+      "ToggleTermSendVisualSelection",
+    },
+    keys = function()
+      local Terminal = require("toggleterm.terminal").Terminal
+      local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
+      local function _LAZYGIT_TOGGLE()
+        lazygit:toggle()
+      end
+      return {
+        "<C-t>",
+        { "<C-t>",      "<cmd>execute v:count . 'ToggleTerm'<CR>",          desc = "Toggle Terminal", noremap = true, silent = true },
+        { "<C-t>",      "<Esc><cmd>ToggleTerm<CR>",                         desc = "Toggle Terminal", noremap = true, silent = true },
+        { "<leader>gg", _LAZYGIT_TOGGLE,                                    desc = "Lazygit" },
+        { "<leader>tg", _LAZYGIT_TOGGLE,                                    desc = "Lazygit" },
+        { "<leader>tf", "<cmd>ToggleTerm direction=float<cr>",              desc = "Float" },
+        { "<leader>th", "<cmd>ToggleTerm size=10 direction=horizontal<cr>", desc = "Horizontal" },
+        { "<leader>tv", "<cmd>ToggleTerm size=80 direction=vertical<cr>",   desc = "Vertical" },
+      }
+    end,
+  },
+  {
     "MagicDuck/grug-far.nvim",
     opts = { headerMaxWidth = 80 },
     keys = function()

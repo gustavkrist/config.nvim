@@ -22,7 +22,7 @@ vim.g.maplocalleader = "\\"
 -- Normal --
 map("n", "<leader><leader>", "<C-^>", { desc = "Go to last used buffer", silent = true })
 map("n", "<leader>c", "<cmd>bd<cr>", { desc = "Close Buffer", silent = true })
-map("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "No Highlight", silent = true })
+map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "No Highlight", silent = true })
 map("n", "<leader>m", "<cmd>messages<cr>", { desc = "Show messages", silent = true })
 
 -- Better window navigation
@@ -73,7 +73,7 @@ map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- Quickfix
 map("n", "[q", "<cmd>cprev<cr>zz", { desc = "Previous Quickfix" })
 map("n", "]q", "<cmd>cnext<cr>zz", { desc = "Next Quickfix" })
-map("n", "<leader>qa", "<cmd>caddexpr expand('%') .. ':' .. line('.') ..  ':' .. getline('.')<cr>", { desc = "" })
+map("n", "<leader>qa", "<cmd>caddexpr expand('%') .. ':' .. line('.') ..  ':' .. getline('.')<cr>", { desc = "Add to quickfix list" })
 map("n", "<leader>qo", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
 -- tabs

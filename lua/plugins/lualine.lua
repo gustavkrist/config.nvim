@@ -243,6 +243,7 @@ return {
           },
           lualine_b = {
             components.branch,
+            "grapple",
           },
           lualine_c = {
             components.diff,

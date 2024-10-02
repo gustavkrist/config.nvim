@@ -129,8 +129,6 @@ end
 
 local function minifiles_open_cwd(fresh)
   local path = vim.api.nvim_buf_get_name(0)
-  print(path)
-  print(vim.fn.filereadable(path) == 1)
   if vim.fn.filereadable(path) == 1 then
     require("mini.files").open(path, fresh)
   else
@@ -188,13 +186,18 @@ return {
       })
       require("mini.icons").setup()
       require("mini.operators").setup()
-      require("mini.sessions").setup()
+      if not require("util.firenvim")() then
+        require("mini.sessions").setup()
+        require("mini.starter").setup()
+      end
       require("mini.splitjoin").setup()
-      require("mini.starter").setup()
       require("mini.trailspace").setup()
       -- Sessions
       vim.api.nvim_create_autocmd({ "BufEnter" }, {
         callback = function()
+          if require("util.firenvim")() then
+            return
+          end
           for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             -- Don't save while there's any 'nofile' buffer open.
             if vim.api.nvim_get_option_value("buftype", { buf = buf }) == "nofile" then
@@ -207,6 +210,9 @@ return {
         end,
       })
       require("util.plugins").on_very_lazy(function()
+        if require("util.firenvim")() then
+          return
+        end
         local buftype = vim.api.nvim_get_option_value("buftype", { buf = 0 })
         if vim.fn.expand("%") == "Starter" and buftype == "nofile" then
           require("util.git").set_git_session_global()

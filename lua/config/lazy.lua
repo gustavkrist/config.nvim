@@ -6,7 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
+      { out,                            "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -15,16 +15,21 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local firenvim = require("util.firenvim").get
+
 require("lazy").setup({
   spec = {
     { import = "plugins.base" },
     { import = "plugins.completion" },
-    { import = "plugins.lsp" },
-    { import = "plugins.lualine" },
-    { import = "plugins.mini" },
-    { import = "plugins.utility" },
-    { import = "plugins.visual" },
     { import = "plugins.filetypes" },
+    { import = "plugins.mini" },
+    { import = "plugins.treesitter" },
+    { import = "plugins.utility" },
+    { import = "plugins.lsp",               cond = not firenvim() },
+    { import = "plugins.lualine",           cond = not firenvim() },
+    { import = "plugins.telescope-grapple", cond = not firenvim() },
+    { import = "plugins.visual",            cond = not firenvim() },
+    { "glacambre/firenvim",                 build = ":call firenvim#install(0)", cond = firenvim() }
   },
   install = { colorscheme = { "nord" } },
   checker = {
