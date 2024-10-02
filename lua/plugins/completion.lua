@@ -24,7 +24,7 @@ return {
         store_selection_keys = "<Tab>",
         ft_func = require("luasnip.extras.filetype_functions").from_pos_or_filetype,
         load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
-          markdown = { "tex", "sql", "python", "vue" },
+          markdown = { "tex", "python", "sql", "vue" },
         }),
         ext_opts = {
           [types.choiceNode] = {

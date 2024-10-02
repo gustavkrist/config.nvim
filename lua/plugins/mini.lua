@@ -187,6 +187,7 @@ return {
         },
       })
       require("mini.icons").setup()
+      require("mini.operators").setup()
       require("mini.sessions").setup()
       require("mini.splitjoin").setup()
       require("mini.starter").setup()
