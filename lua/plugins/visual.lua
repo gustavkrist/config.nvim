@@ -41,17 +41,17 @@ return {
           auto_toggle_bufferline = true,
           move_wraps_at_ends = false,
           groups = { items = {}, options = { toggle_hidden_on_enter = true } },
-          mode = "buffers",             -- set to "tabs" to only show tabpages instead
-          numbers = "none",             -- can be "none" | "ordinal" | "buffer_id" | "both" | function
+          mode = "buffers",               -- set to "tabs" to only show tabpages instead
+          numbers = "none",               -- can be "none" | "ordinal" | "buffer_id" | "both" | function
           close_command = function(bufnr) -- can be a string | function, see "Mouse actions"
             bl_util.buf_kill("bd", bufnr, false)
           end,
           right_mouse_command = "vert sbuffer %d", -- can be a string | function, see "Mouse actions"
-          left_mouse_command = "buffer %d",      -- can be a string | function, see "Mouse actions"
-          middle_mouse_command = nil,            -- can be a string | function, see "Mouse actions"
+          left_mouse_command = "buffer %d",        -- can be a string | function, see "Mouse actions"
+          middle_mouse_command = nil,              -- can be a string | function, see "Mouse actions"
           indicator = {
-            icon = icons.ui.BoldLineLeft,        -- this should be omitted if indicator style is not 'icon'
-            style = "icon",                      -- can also be 'underline'|'none',
+            icon = icons.ui.BoldLineLeft, -- this should be omitted if indicator style is not 'icon'
+            style = "icon",               -- can also be 'underline'|'none',
           },
           buffer_close_icon = icons.ui.Close,
           modified_icon = icons.ui.Circle,
@@ -172,6 +172,8 @@ return {
   },
   {
     "folke/noice.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    version = "4.4.7",
     event = "VimEnter",
     opts = {
       lsp = {
@@ -214,7 +216,6 @@ return {
       },
     },
     keys = {
-      -- { "<leader>sn", "", desc = "+noice"},
       {
         "<S-Enter>",
         function()
