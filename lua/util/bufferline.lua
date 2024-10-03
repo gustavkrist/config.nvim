@@ -1,5 +1,6 @@
 local M = {}
 local icons = require("util.icons")
+local plugin_util = require("util.plugins")
 
 local function is_ft(b, ft)
   return vim.bo[b].filetype == ft
@@ -17,7 +18,7 @@ function M.diagnostics_indicator(num, _, diagnostics, _)
       table.insert(result, symbols[name] .. " " .. count)
     end
   end
-  res= table.concat(result, " ")
+  local res = table.concat(result, " ")
   return #res > 0 and res or ""
 end
 
@@ -36,6 +37,35 @@ function M.custom_filter(buf, buf_nums)
   end
   -- only show log buffers in secondary tabs
   return (tab_num == last_tab and is_log) or (tab_num ~= last_tab and not is_log)
+end
+
+function M.grapple_filter(buf, _)
+  return vim.api.nvim_get_current_buf() == buf or require("grapple").name_or_index({ buffer = buf })
+end
+
+function M.get_filter_func()
+  if plugin_util.has("grapple.nvim") then
+    return M.grapple_filter
+  end
+  return M.custom_filter
+end
+
+function M.get_sort_func()
+  local function grapple_sort(buffer_a, buffer_b)
+    local a_tag_index = require("grapple").name_or_index({ buffer = buffer_a.id })
+    local b_tag_index = require("grapple").name_or_index({ buffer = buffer_b.id })
+    if a_tag_index and not b_tag_index then
+      return true
+    elseif not a_tag_index and b_tag_index then
+      return false
+    else
+      return a_tag_index < b_tag_index
+    end
+  end
+  if plugin_util.has("grapple.nvim") then
+    return grapple_sort
+  end
+  return "id"
 end
 
 --stylua: ignore
@@ -69,7 +99,8 @@ function M.buf_kill(kill_command, bufnr, force)
         end)
       elseif choice == 2 then
         force = true
-      else return
+      else
+        return
       end
     elseif api.nvim_get_option_value("buftype", { buf = 0 }) == "terminal" then
       choice = fn.confirm(fmt([[Close "%s"?]], bufname), "&Yes\n&No\n&Cancel")

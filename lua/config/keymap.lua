@@ -21,7 +21,7 @@ vim.g.maplocalleader = "\\"
 
 -- Normal --
 map("n", "<leader><leader>", "<C-^>", { desc = "Go to last used buffer", silent = true })
-map("n", "<leader>c", "<cmd>bd<cr>", { desc = "Close Buffer", silent = true })
+map("n", "<leader>c", "<cmd>lua require('util.bufferline').buf_kill()<cr>", { desc = "Close Buffer", silent = true })
 map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "No Highlight", silent = true })
 map("n", "<leader>m", "<cmd>messages<cr>", { desc = "Show messages", silent = true })
 
@@ -50,6 +50,8 @@ map("n", "<C-Up>", ":resize -2<CR>", opts)
 -- Navigate buffers
 map("n", "<Tab>", ":bnext<CR>", opts)
 map("n", "<S-Tab>", ":bprevious<CR>", opts)
+map("n", "]b", ":bnext<CR>", opts)
+map("n", "[b", ":bprevious<CR>", opts)
 
 -- Move text up and down
 map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })

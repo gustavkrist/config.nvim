@@ -1,4 +1,3 @@
-local map = vim.keymap.set
 return {
   {
     "akinsho/toggleterm.nvim",
@@ -17,6 +16,7 @@ return {
       "ToggleTermSendVisualLines",
       "ToggleTermSendVisualSelection",
     },
+    lazy = true,
     keys = function()
       local Terminal = require("toggleterm.terminal").Terminal
       local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })

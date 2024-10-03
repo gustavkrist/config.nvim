@@ -1,13 +1,16 @@
 return {
-  { "folke/lazy.nvim",      tag = "stable" },
+  {
+    "folke/lazy.nvim",
+    tag = "stable",
+  },
   { "nvim-lua/plenary.nvim" },
   {
     "tpope/vim-surround",
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     "tpope/vim-repeat",
-    event = "VimEnter",
+    event = "VeryLazy",
   },
   {
     "folke/which-key.nvim",
@@ -126,6 +129,7 @@ return {
       -- vim.keymap.set("x", "gs", "<Plug>(leap-cross-window)", { silent = true })
       -- vim.keymap.set("o", "gs", "<Plug>(leap-cross-window)", { silent = true })
     end,
+    event = "VeryLazy",
   },
   {
     "okuuva/auto-save.nvim",

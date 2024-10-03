@@ -130,6 +130,7 @@ return {
         end,
       })
     end,
+    ft = { "markdown" },
   },
   {
     "bullets-vim/bullets.vim",

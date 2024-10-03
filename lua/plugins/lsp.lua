@@ -90,6 +90,7 @@ return {
     "williamboman/mason-lspconfig.nvim",
     opts = {},
     dependencies = "mason.nvim",
+    lazy = true,
   },
   {
     "stevearc/conform.nvim",
@@ -184,6 +185,7 @@ return {
         end,
       })
     end,
+    lazy = true,
   },
   {
     "SmiteshP/nvim-navic",
@@ -239,7 +241,7 @@ return {
         depth_limit_indicator = "..",
       }
     end,
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     {
@@ -253,7 +255,6 @@ return {
     opts = {
       snippet_engine = "luasnip",
     },
-    event = "User FileOpened",
     keys = {
       { "<leader>nc", "<cmd>lua require('neogen').generate({ type = 'class' })<cr>", desc = "Generate Annotations (Class)" },
       { "<leader>nf", "<cmd>lua require('neogen').generate({ type = 'func' })<cr>",  desc = "Generate Annotations (Function)" },

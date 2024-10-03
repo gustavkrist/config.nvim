@@ -2,18 +2,18 @@ return {
   {
     "norcalli/nvim-colorizer.lua",
     opts = {},
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     "folke/todo-comments.nvim",
     opts = {},
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
     opts = {},
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     "stevearc/dressing.nvim",
@@ -35,11 +35,9 @@ return {
         },
         options = {
           themable = true, -- whether or not bufferline highlights can be overridden externally
-          get_element_icon = nil,
           show_duplicate_prefix = true,
           duplicates_across_groups = true,
           auto_toggle_bufferline = true,
-          move_wraps_at_ends = false,
           groups = { items = {}, options = { toggle_hidden_on_enter = true } },
           mode = "buffers",               -- set to "tabs" to only show tabpages instead
           numbers = "none",               -- can be "none" | "ordinal" | "buffer_id" | "both" | function
@@ -53,30 +51,11 @@ return {
             icon = icons.ui.BoldLineLeft, -- this should be omitted if indicator style is not 'icon'
             style = "icon",               -- can also be 'underline'|'none',
           },
-          buffer_close_icon = icons.ui.Close,
-          modified_icon = icons.ui.Circle,
-          close_icon = icons.ui.BoldClose,
-          left_trunc_marker = icons.ui.ArrowCircleLeft,
-          right_trunc_marker = icons.ui.ArrowCircleRight,
-          --- name_formatter can be used to change the buffer's label in the bufferline.
-          --- Please note some names can/will break the
-          --- bufferline so use this at your discretion knowing that it has
-          --- some limitations that will *NOT* be fixed.
-          name_formatter = function(buf) -- buf contains a "name", "path" and "bufnr"
-            -- remove extension from markdown files for example
-            if buf.name:match("%.md") then
-              return vim.fn.fnamemodify(buf.name, ":t:r")
-            end
-          end,
-          max_name_length = 18,
-          max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
-          truncate_names = true, -- whether or not tab names should be truncated
-          tab_size = 18,
           diagnostics = "nvim_lsp",
           diagnostics_update_in_insert = false,
           diagnostics_indicator = bl_util.diagnostics_indicator,
           -- NOTE: this will be called a lot so don't do any heavy processing here
-          custom_filter = bl_util.custom_filter,
+          custom_filter = bl_util.get_filter_func(),
           offsets = {
             {
               filetype = "undotree",
@@ -124,13 +103,12 @@ return {
             delay = 200,
             reveal = { "close" },
           },
-          sort_by = "id",
+          sort_by = bl_util.get_sort_func(),
           debug = { logging = false },
         },
       }
     end,
-    branch = "main",
-    event = "User FileOpened",
+    event = "VeryLazy",
   },
   {
     "rcarriga/nvim-notify",
