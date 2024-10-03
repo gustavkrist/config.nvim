@@ -222,6 +222,7 @@ return {
             hi @markup.heading.6.markdown guifg=#D8DEE9
             hi RenderMarkdownH6Bg guifg=#D8DEE9 guibg=#3d434f
             hi! link NoiceLspProgressTitle @comment
+            hi NavicSeparator guibg=NONE
             ]])
         end,
       })

@@ -190,7 +190,6 @@ return {
     config = function(_, opts)
       require("util.navic").create_winbar()
       require("nvim-navic").setup(opts)
-      vim.cmd("hi NavicSeparator guibg=NONE")
     end,
     opts = function()
       local function get_icon(kind)
