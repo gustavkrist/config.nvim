@@ -100,4 +100,54 @@ return {
     opts = {},
     ft = { "html", "vue" },
   },
+  {
+    "folke/zen-mode.nvim",
+    dependencies = {
+      { "folke/twilight.nvim", lazy = true, opts = { dimming = { term_bg = "#2E3440" } } },
+    },
+    opts = {
+      window = {
+        options = {
+          number = false,
+          relativenumber = false,
+        },
+      },
+      plugins = {
+        gitsigns = {
+          enabled = true,
+        },
+        wezterm = {
+          enabled = true,
+          font = "+2",
+        },
+        neovide = {
+          enabled = true,
+        },
+      },
+      on_open = function()
+        local lualine_ok, lualine = pcall(require, "lualine")
+        if lualine_ok then
+          lualine.hide({ place = { "statusline", "winbar", "tabline" }, unhide = false })
+          vim.api.nvim_set_option_value("winbar", "", { scope = "local" })
+        end
+        local ibl_ok, ibl = pcall(require, "ibl")
+        if ibl_ok then
+          ibl.update({ enabled = false })
+        end
+      end,
+      on_close = function()
+        local lualine_ok, lualine = pcall(require, "lualine")
+        if lualine_ok then
+          lualine.hide({ place = { "statusline", "winbar", "tabline" }, unhide = true })
+        end
+        if ibl_ok then
+          ibl.update({ enabled = true })
+        end
+      end,
+    },
+    cmd = "ZenMode",
+    keys = {
+      { "<leader>uz", function() require("zen-mode").toggle() end, desc = "Toggle Zen Mode" },
+    },
+  },
 }

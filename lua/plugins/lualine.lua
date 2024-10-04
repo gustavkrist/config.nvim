@@ -340,6 +340,11 @@ return {
             },
           },
         },
+        winbar = {
+          lualine_a = {
+            { require("util.navic").get_winbar },
+          },
+        },
         extensions = {},
       }
     end,

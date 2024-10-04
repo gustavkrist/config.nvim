@@ -197,7 +197,6 @@ return {
     "SmiteshP/nvim-navic",
     cond = no_firenvim,
     config = function(_, opts)
-      require("util.navic").create_winbar()
       require("nvim-navic").setup(opts)
     end,
     opts = function()

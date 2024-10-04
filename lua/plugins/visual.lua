@@ -2,17 +2,23 @@ local no_firenvim = function() return not require("util.firenvim").get() end
 return {
   {
     "norcalli/nvim-colorizer.lua",
+    config = function(_, opts)
+      require("colorizer").setup(#opts > 0 and opts or nil)
+    end,
     opts = {},
-    event = "VeryLazy",
+    lazy = false,
+    keys = {
+      { "<leader>uc", "<cmd>ColorizerToggle<cr>", desc = "Toggle Colorizer" },
+    },
   },
   {
     "folke/todo-comments.nvim",
     opts = {},
     event = "VeryLazy",
     keys = {
-      { "[t", function() require("todo-comments").jump_prev() end, desc = "Prev todo comment" },
-      { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-      { "<leader>st", "<cmd>TodoTelescope keywords=TODO,FIX<cr>", desc = "Search Todo-Comments"}
+      { "[t",         function() require("todo-comments").jump_prev() end, desc = "Prev todo comment" },
+      { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+      { "<leader>st", "<cmd>TodoTelescope keywords=TODO,FIX<cr>",          desc = "Search Todo-Comments" }
     }
   },
   {
@@ -198,6 +204,7 @@ return {
         command_palette = false,
         long_message_to_split = true,
         lsp_doc_border = true,
+        inc_rename = true,
       },
       views = {
         mini = {
@@ -262,30 +269,11 @@ return {
     lazy = true,
   },
   {
-    "will-lynas/grapple-line.nvim",
-    cond = no_firenvim,
-    dependencies = {
-      "cbochs/grapple.nvim",
-    },
-    version = "1.x",
-    opts = {
-      number_of_files = 4,
-      colors = {
-        active = "lualine_a_normal",
-        inactive = "@comment",
-      },
-      -- Accepted values:
-      -- "unique_filename" shows the filename and parent directories if needed
-      -- "filename" shows the filename only
-      mode = "unique_filename",
-      -- If a tag name is set, use that instead of the filename
-      show_names = false,
-      -- Accepted values:
-      -- "none" - overflowing files are ignored
-      -- "ellipsis" - if there are overflowing files an ellipsis will be shown
-      overflow = "ellipsis",
-      -- Files for which the parent directory should always be shown
-      always_show_parent = {},
+    "smjonas/inc-rename.nvim",
+    opts = {},
+    cmd = "IncRename",
+    keys = {
+      { "<leader>lr", function() return ":IncRename " .. vim.fn.expand("<cword>") end, desc = "Rename", expr = true },
     },
   },
 }

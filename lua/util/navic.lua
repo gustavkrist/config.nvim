@@ -135,7 +135,11 @@ function M.get_winbar()
     local tabpage_number = tostring(vim.api.nvim_tabpage_get_number(0))
     value = value .. "%=" .. tabpage_number .. "/" .. tostring(num_tabs)
   end
+  return value
+end
 
+function M.set_winbar()
+  local value = M.get_winbar()
   local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
   if not status_ok then
     return
@@ -158,7 +162,7 @@ function M.create_winbar()
     callback = function()
       local status_ok, _ = pcall(vim.api.nvim_buf_get_var, 0, "lsp_floating_window")
       if not status_ok then
-        M.get_winbar()
+        M.set_winbar()
       end
     end,
   })

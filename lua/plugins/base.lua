@@ -117,10 +117,10 @@ return {
           gitsigns.undo_stage_hunk,
           desc = "Undo Stage Hunk",
         },
-        { "<leader>gd", gitsigns.diffthis,                  desc = "Git Diff" },
+        { "<leader>gd",  gitsigns.diffthis,                  desc = "Git Diff" },
         { "<leader>gtb", gitsigns.toggle_current_line_blame, desc = "Toggle Current Line Blame" },
         { "<leader>gtd", gitsigns.toggle_deleted,            desc = "Toggle Show Deleted Lines" },
-        { "ih",         ":<C-u>Gitsigns select_hunk<cr>",   mode = { "o", "x" } },
+        { "ih",          ":<C-u>Gitsigns select_hunk<cr>",   mode = { "o", "x" } },
       }
     end,
     event = "User FileOpened",
@@ -152,7 +152,7 @@ return {
     config = function()
       local function in_snippets_dir(buf)
         for dir in vim.fs.parents(vim.api.nvim_buf_get_name(buf)) do
-          if dir == (os.getenv("XDG_CONFIG_HOME") .. "/nvim/lua/luasnippets") then
+          if dir == ((os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config" or "") .. "/nvim/lua/luasnippets") then
             return true
           end
         end
