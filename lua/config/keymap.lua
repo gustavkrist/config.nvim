@@ -48,10 +48,10 @@ map("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 map("n", "<C-Up>", ":resize -2<CR>", opts)
 
 -- Navigate buffers
-map("n", "<Tab>", ":bnext<CR>", opts)
-map("n", "<S-Tab>", ":bprevious<CR>", opts)
-map("n", "]b", ":bnext<CR>", opts)
-map("n", "[b", ":bprevious<CR>", opts)
+map("n", "<Tab>", "<cmd>execute 'bnext ' . max([v:count, 1])<CR>", opts)
+map("n", "<S-Tab>", "<cmd>execute 'bprevious ' . max([v:count, 1])<CR>", opts)
+map("n", "]b", "<cmd>execute 'bnext ' . max([v:count, 1])<CR>", opts)
+map("n", "[b", "<cmd>execute 'bprevious ' . max([v:count, 1])<CR>", opts)
 
 -- Move text up and down
 map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
