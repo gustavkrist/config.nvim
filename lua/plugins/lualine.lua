@@ -1,6 +1,7 @@
 return {
   {
     "nvim-lualine/lualine.nvim",
+    cond = function() return not require("util.firenvim").get() end,
     dependencies = {
       "nvim-tree/nvim-web-devicons",
       "gbprod/nord.nvim",

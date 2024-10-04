@@ -25,11 +25,11 @@ require("lazy").setup({
     { import = "plugins.mini" },
     { import = "plugins.treesitter" },
     { import = "plugins.utility" },
-    { import = "plugins.lsp",               cond = not firenvim() },
-    { import = "plugins.lualine",           cond = not firenvim() },
-    { import = "plugins.telescope-grapple", cond = not firenvim() },
-    { import = "plugins.visual",            cond = not firenvim() },
-    { "glacambre/firenvim",                 build = ":call firenvim#install(0)", cond = firenvim() }
+    { import = "plugins.lsp" },
+    { import = "plugins.lualine" },
+    { import = "plugins.telescope-grapple" },
+    { import = "plugins.visual" },
+    { "glacambre/firenvim",                build = ":call firenvim#install(0)", cond = firenvim() }
   },
   install = { colorscheme = { "nord" } },
   checker = {

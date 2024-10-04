@@ -1,6 +1,8 @@
+local no_firenvim = function() return not require("util.firenvim").get() end
 return {
   {
     "neovim/nvim-lspconfig",
+    cond = no_firenvim,
     lazy = true,
     dependencies = {
       "mason-lspconfig.nvim",
@@ -76,6 +78,7 @@ return {
   },
   {
     "williamboman/mason.nvim",
+    cond = no_firenvim,
     opts = {},
     build = function()
       pcall(function()
@@ -88,12 +91,14 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
+    cond = no_firenvim,
     opts = {},
     dependencies = "mason.nvim",
     lazy = false,
   },
   {
     "stevearc/conform.nvim",
+    cond = no_firenvim,
     config = function()
       local opts = {
         default_format_opts = {
@@ -160,6 +165,7 @@ return {
   },
   {
     "mfussenegger/nvim-lint",
+    cond = no_firenvim,
     config = function()
       local linters_by_ft = {
         lua = { "stylua" },
@@ -189,6 +195,7 @@ return {
   },
   {
     "SmiteshP/nvim-navic",
+    cond = no_firenvim,
     config = function(_, opts)
       require("util.navic").create_winbar()
       require("nvim-navic").setup(opts)
@@ -251,6 +258,7 @@ return {
     },
   },
   {
+    cond = no_firenvim,
     "danymat/neogen",
     opts = {
       snippet_engine = "luasnip",
@@ -261,5 +269,5 @@ return {
       { "<leader>nt", "<cmd>lua require('neogen').generate({ type = 'type' })<cr>",  desc = "Generate Annotations (Type)" },
       { "<leader>nF", "<cmd>lua require('neogen').generate({ type = 'file' })<cr>",  desc = "Generate Annotations (File)" },
     }
-  }
+  },
 }

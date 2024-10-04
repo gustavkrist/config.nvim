@@ -1,3 +1,4 @@
+local no_firenvim = function() return not require("util.firenvim").get() end
 return {
   {
     "norcalli/nvim-colorizer.lua",
@@ -22,6 +23,7 @@ return {
   },
   {
     "stevearc/dressing.nvim",
+    cond = no_firenvim,
     event = "VimEnter",
   },
   {
@@ -118,20 +120,7 @@ return {
   },
   {
     "rcarriga/nvim-notify",
-    keys = {
-      {
-        "<leader>un",
-        function()
-          require("notify").dismiss({ silent = true, pending = true })
-        end,
-        desc = "Dismiss All Notifications",
-      },
-      {
-        "<leader>sn",
-        "<cmd>lua require('telescope').extensions.notify.notify(require('telescope.themes').get_dropdown({previewer = false}))<cr>",
-        desc = "Search notifications",
-      },
-    },
+    cond = no_firenvim,
     opts = {
       stages = "static",
       timeout = 3000,
@@ -153,9 +142,24 @@ return {
         end)
       end
     end,
+    keys = {
+      {
+        "<leader>un",
+        function()
+          require("notify").dismiss({ silent = true, pending = true })
+        end,
+        desc = "Dismiss All Notifications",
+      },
+      {
+        "<leader>sn",
+        "<cmd>lua require('telescope').extensions.notify.notify(require('telescope.themes').get_dropdown({previewer = false}))<cr>",
+        desc = "Search notifications",
+      },
+    },
   },
   {
     "folke/noice.nvim",
+    cond = no_firenvim,
     dependencies = { "MunifTanjim/nui.nvim" },
     version = "4.4.7",
     event = "VeryLazy",
@@ -254,10 +258,12 @@ return {
   },
   {
     "MunifTanjim/nui.nvim",
+    cond = no_firenvim,
     lazy = true,
   },
   {
     "will-lynas/grapple-line.nvim",
+    cond = no_firenvim,
     dependencies = {
       "cbochs/grapple.nvim",
     },

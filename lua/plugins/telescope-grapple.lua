@@ -1,6 +1,7 @@
 return {
   {
     "cbochs/grapple.nvim",
+    cond = function() return not require("util.firenvim").get() end,
     dependencies = {
       { "nvim-tree/nvim-web-devicons", lazy = true },
     },
@@ -39,6 +40,7 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
+    cond = function() return not require("util.firenvim").get() end,
     dependencies = {
       {
         "nvim-telescope/telescope-fzf-native.nvim",
