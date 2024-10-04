@@ -78,10 +78,6 @@ map("n", "]q", "<cmd>cnext<cr>zz", { desc = "Next Quickfix" })
 map("n", "<leader>qa", "<cmd>caddexpr expand('%') .. ':' .. line('.') ..  ':' .. getline('.')<cr>", { desc = "Add to quickfix list" })
 map("n", "<leader>qo", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
--- Git hunks
-map("n", "[h", "<cmd>lua require('gitsigns').nav_hunk('next', {navigation_message = false})<cr>", {desc = "Next Hunk"})
-map("n", "]h", "<cmd>lua require('gitsigns').nav_hunk('prev', {navigation_message = false})<cr>", {desc = "Prev Hunk"})
-
 -- tabs
 map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
 map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })

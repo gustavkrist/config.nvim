@@ -85,30 +85,40 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     opts = {},
-    keys = {
-      {
-        "<leader>gj",
-        "<cmd>lua require('gitsigns').nav_hunk('next', {navigation_message = false})<cr>",
-        desc = "Next Hunk",
-      },
-      {
-        "<leader>gk",
-        "<cmd>lua require('gitsigns').nav_hunk('prev', {navigation_message = false})<cr>",
-        desc = "Prev Hunk",
-      },
-      { "<leader>gl", "<cmd>lua require('gitsigns').blame_line()<cr>",            desc = "Blame" },
-      { "<leader>gL", "<cmd>lua require('gitsigns').blame_line({full=true})<cr>", desc = "Blame Line (full)" },
-      { "<leader>gp", "<cmd>lua require('gitsigns').preview_hunk()<cr>",          desc = "Preview Hunk" },
-      { "<leader>gr", "<cmd>lua require('gitsigns').reset_hunk()<cr>",            desc = "Reset Hunk" },
-      { "<leader>gR", "<cmd>lua require('gitsigns').reset_buffer()<cr>",          desc = "Reset Buffer" },
-      { "<leader>gs", "<cmd>lua require('gitsigns').stage_hunk()<cr>",            desc = "Stage Hunk" },
-      {
-        "<leader>gu",
-        "<cmd>lua require('gitsigns').undo_stage_hunk()<cr>",
-        desc = "Undo Stage Hunk",
-      },
-      { "<leader>gd", "<cmd>Gitsigns diffthis HEAD<cr>", desc = "Git Diff" },
-    },
+    keys = function()
+      local gitsigns = require("gitsigns")
+      return {
+        {
+          "<leader>gj",
+          function() gitsigns.nav_hunk('next', { navigation_message = false }) end,
+          desc = "Next Hunk",
+        },
+        {
+          "<leader>gk",
+          function() gitsigns.nav_hunk('prev', { navigation_message = false }) end,
+          desc = "Prev Hunk",
+        },
+        { "[h",         function() gitsigns.nav_hunk('next', { navigation_message = false }) end,   desc = "Next Hunk" },
+        { "]h",         function() gitsigns.nav_hunk('prev', { navigation_message = false }) end,   desc = "Prev Hunk" },
+        { "<leader>gl", gitsigns.blame_line,                                                        desc = "Blame" },
+        { "<leader>gL", function() gitsigns.blame_line({ full = true }) end,                        desc = "Blame Line (full)" },
+        { "<leader>gp", gitsigns.preview_hunk,                                                      desc = "Preview Hunk" },
+        { "<leader>gr", gitsigns.reset_hunk,                                                        desc = "Reset Hunk" },
+        { "<leader>gs", function() gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') }) end, desc = "Stage Hunk",       mode = { "v" } },
+        { "<leader>gR", gitsigns.reset_buffer,                                                      desc = "Reset Buffer" },
+        { "<leader>gs", gitsigns.stage_hunk,                                                        desc = "Stage Hunk" },
+        { "<leader>gs", function() gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') }) end, desc = "Stage Hunk",       mode = { "v" } },
+        {
+          "<leader>gu",
+          gitsigns.undo_stage_hunk,
+          desc = "Undo Stage Hunk",
+        },
+        { "<leader>gd", gitsigns.diffthis,                  desc = "Git Diff" },
+        { "<leader>gtb", gitsigns.toggle_current_line_blame, desc = "Toggle Current Line Blame" },
+        { "<leader>gtd", gitsigns.toggle_deleted,            desc = "Toggle Show Deleted Lines" },
+        { "ih",         ":<C-u>Gitsigns select_hunk<cr>",   mode = { "o", "x" } },
+      }
+    end,
     event = "User FileOpened",
     cmd = "Gitsigns",
   },
