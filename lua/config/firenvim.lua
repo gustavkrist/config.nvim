@@ -32,6 +32,10 @@ vim.api.nvim_create_autocmd({'BufEnter'}, {
     command = "set filetype=markdown"
 })
 vim.api.nvim_create_autocmd({'BufEnter'}, {
+    pattern = "app.slack.com_*.txt",
+    command = "set filetype=markdown | set lines=4 | set columns=90"
+})
+vim.api.nvim_create_autocmd({'BufEnter'}, {
     pattern = "*scripthelp*.txt",
     command = "set filetype=python"
 })

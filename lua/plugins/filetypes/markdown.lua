@@ -108,12 +108,12 @@ return {
   {
     "vim-pandoc/vim-pandoc",
     init = function()
+      vim.g["pandoc#filetypes#pandoc_markdown"] = 0
       vim.g["pandoc#filetypes#handled"] = { "pandoc", "markdown" }
       vim.g["pandoc#folding#fold_yaml"] = 1
       vim.g["pandoc#folding#fold_fenced_codeblocks"] = 1
       vim.g["pandoc#folding#fastfolds"] = 1
       vim.g["pandoc#folding#fdc"] = 0
-      vim.g["pandoc#filetypes#pandoc_markdown"] = 0
       -- vim.g["pandoc#modules#enabled"] = { "keyboard" }
       -- vim.g["pandoc#modules#disabled"] = { "formatting", "folding", "hypertext" }
       vim.api.nvim_create_autocmd("FileType", {
@@ -130,7 +130,6 @@ return {
         end,
       })
     end,
-    ft = { "markdown" },
   },
   {
     "bullets-vim/bullets.vim",
