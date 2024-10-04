@@ -90,7 +90,7 @@ return {
     "williamboman/mason-lspconfig.nvim",
     opts = {},
     dependencies = "mason.nvim",
-    lazy = true,
+    lazy = false,
   },
   {
     "stevearc/conform.nvim",
