@@ -8,10 +8,15 @@ vim.g.firenvim_config = {
     },
   },
 }
-vim.keymap.set("i", "<C-v>", "<C-r>*")
-vim.keymap.set("i", "<C-v>", "<C-r>*")
-vim.keymap.set("c", "<C-S-v>", "<C-r>*")
-vim.keymap.set("c", "<C-S-v>", "<C-r>*")
+vim.keymap.set(
+  "i",
+  "<C-S-v>",
+  "<C-o>:set paste<cr>a<c-r>+<cr><C-o>:set nopaste<cr>mi`[=`]`ia",
+  { noremap = false, silent = true }
+)
+vim.keymap.set("!", "<C-S-v>", "<C-R>+", { noremap = true, silent = true })
+vim.keymap.set("t", "<C-S-v>", "<C-\\><C-n>pi", { noremap = false, silent = true })
+vim.keymap.set({ "v", "n" }, "<C-S-v>", '"+gP', { noremap = true, silent = true })
 vim.api.nvim_create_autocmd({'UIEnter'}, {
     callback = function(event)
         local client = vim.api.nvim_get_chan_info(vim.v.event.chan).client
