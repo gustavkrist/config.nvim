@@ -201,7 +201,7 @@ return {
             return chars[index]
           end,
           padding = { left = 0, right = 0 },
-          color = "SLProgress",
+          color = {},
           cond = nil,
         },
       }
@@ -229,7 +229,7 @@ return {
               a = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
               b = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
               c = { fg = palette.polar_night.bright, bg = "NONE" },
-            }
+            },
           },
           globalstatus = true,
           icons_enabled = true,
@@ -239,7 +239,7 @@ return {
         },
         sections = {
           lualine_a = {
-            components.mode,
+            -- components.mode,
           },
           lualine_b = {
             components.branch,
@@ -258,11 +258,12 @@ return {
           lualine_y = { components.location },
           lualine_z = {
             components.progress,
+            components.scrollbar,
           },
         },
         inactive_sections = {
           lualine_a = {
-            components.mode,
+            -- components.mode,
           },
           lualine_b = {
             components.branch,
@@ -280,12 +281,31 @@ return {
           lualine_y = { components.location },
           lualine_z = {
             components.progress,
+            components.scrollbar,
           },
         },
-        tabline = {},
+        tabline = {
+          lualine_a = {
+            {
+              "filename",
+              path = 1,
+              newfile_status = true,
+              shorting_target = 90,
+            },
+          },
+          lualine_x = { require("grapple-line").lualine },
+          lualine_z = {
+            {
+              "tabs",
+              cond = function()
+                return #vim.api.nvim_list_tabpages() > 1
+              end,
+            },
+          },
+        },
         extensions = {},
       }
     end,
-    event = "VimEnter",
+    event = "VeryLazy",
   },
 }

@@ -47,6 +47,7 @@ local options = {
   jumpoptions = "view",
   sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" },
   virtualedit = "block",
+  laststatus = 0,
 }
 
 vim.opt.formatoptions:append({ "n" })

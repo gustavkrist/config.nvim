@@ -21,6 +21,7 @@ return {
   },
   {
     "akinsho/bufferline.nvim",
+    cond = false,
     opts = function()
       local icons = require("util.icons")
       local bl_util = require("util.bufferline")
@@ -39,17 +40,17 @@ return {
           duplicates_across_groups = true,
           auto_toggle_bufferline = true,
           groups = { items = {}, options = { toggle_hidden_on_enter = true } },
-          mode = "buffers",               -- set to "tabs" to only show tabpages instead
-          numbers = "none",               -- can be "none" | "ordinal" | "buffer_id" | "both" | function
+          mode = "buffers", -- set to "tabs" to only show tabpages instead
+          numbers = "none", -- can be "none" | "ordinal" | "buffer_id" | "both" | function
           close_command = function(bufnr) -- can be a string | function, see "Mouse actions"
             bl_util.buf_kill("bd", bufnr, false)
           end,
           right_mouse_command = "vert sbuffer %d", -- can be a string | function, see "Mouse actions"
-          left_mouse_command = "buffer %d",        -- can be a string | function, see "Mouse actions"
-          middle_mouse_command = nil,              -- can be a string | function, see "Mouse actions"
+          left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
+          middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
           indicator = {
             icon = icons.ui.BoldLineLeft, -- this should be omitted if indicator style is not 'icon'
-            style = "icon",               -- can also be 'underline'|'none',
+            style = "icon", -- can also be 'underline'|'none',
           },
           diagnostics = "nvim_lsp",
           diagnostics_update_in_insert = false,
@@ -249,5 +250,31 @@ return {
   {
     "MunifTanjim/nui.nvim",
     lazy = true,
+  },
+  {
+    "will-lynas/grapple-line.nvim",
+    dependencies = {
+      "cbochs/grapple.nvim",
+    },
+    version = "1.x",
+    opts = {
+      number_of_files = 4,
+      colors = {
+        active = "lualine_a_normal",
+        inactive = "@comment",
+      },
+      -- Accepted values:
+      -- "unique_filename" shows the filename and parent directories if needed
+      -- "filename" shows the filename only
+      mode = "unique_filename",
+      -- If a tag name is set, use that instead of the filename
+      show_names = false,
+      -- Accepted values:
+      -- "none" - overflowing files are ignored
+      -- "ellipsis" - if there are overflowing files an ellipsis will be shown
+      overflow = "ellipsis",
+      -- Files for which the parent directory should always be shown
+      always_show_parent = {},
+    },
   },
 }
