@@ -84,6 +84,10 @@ return {
   },
   {
     "lewis6991/gitsigns.nvim",
+    config = function(_, opts)
+      require("gitsigns").setup(opts)
+      vim.o.signcolumn = "yes:2"
+    end,
     opts = {},
     keys = function()
       local gitsigns = require("gitsigns")
@@ -98,8 +102,8 @@ return {
           function() gitsigns.nav_hunk('prev', { navigation_message = false }) end,
           desc = "Prev Hunk",
         },
-        { "[h",         function() gitsigns.nav_hunk('next', { navigation_message = false }) end,   desc = "Next Hunk" },
-        { "]h",         function() gitsigns.nav_hunk('prev', { navigation_message = false }) end,   desc = "Prev Hunk" },
+        { "]h",         function() gitsigns.nav_hunk('next', { navigation_message = false }) end,   desc = "Next Hunk" },
+        { "[h",         function() gitsigns.nav_hunk('prev', { navigation_message = false }) end,   desc = "Prev Hunk" },
         { "<leader>gl", gitsigns.blame_line,                                                        desc = "Blame" },
         { "<leader>gL", function() gitsigns.blame_line({ full = true }) end,                        desc = "Blame Line (full)" },
         { "<leader>gp", gitsigns.preview_hunk,                                                      desc = "Preview Hunk" },
