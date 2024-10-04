@@ -2,14 +2,18 @@ return {
   {
     "cbochs/grapple.nvim",
     dependencies = {
-      { "nvim-tree/nvim-web-devicons", lazy = true }
+      { "nvim-tree/nvim-web-devicons", lazy = true },
     },
     config = function(_, opts)
       require("grapple").setup(opts)
       require("util.plugins").on_load("telescope.nvim", function()
         require("telescope").load_extension("grapple")
-        vim.keymap.set("n", "<leader>ht", "<cmd>Telescope grapple tags theme=dropdown<cr>",
-          { desc = "Telescope grapple tags" })
+        vim.keymap.set(
+          "n",
+          "<leader>ht",
+          "<cmd>Telescope grapple tags theme=dropdown<cr>",
+          { desc = "Telescope grapple tags" }
+        )
       end)
     end,
     opts = {
@@ -18,23 +22,34 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     cmd = "Grapple",
     keys = {
-      { "<leader>hm",       "<cmd>Grapple toggle<cr>",          desc = "Grapple toggle tag" },
-      { "<leader>hh",       "<cmd>Grapple toggle_tags<cr>",     desc = "Grapple open tags window" },
-      { "<leader>hs",       "<cmd>Grapple open_scopes<cr>",     desc = "Grapple open scopes window" },
-      { "<leader>hl",       "<cmd>Grapple open_loaded<cr>",     desc = "Grapple open loaded scopes window" },
-      { "<leader>1",        "<cmd>Grapple select index=1<cr>",  desc = "[Grapple] Select first tag" },
-      { "<leader>2",        "<cmd>Grapple select index=2<cr>",  desc = "[Grapple] Select second tag" },
-      { "<leader>3",        "<cmd>Grapple select index=3<cr>",  desc = "[Grapple] Select third tag" },
-      { "<leader>4",        "<cmd>Grapple select index=4<cr>",  desc = "[Grapple] Select fourth tag" },
-      { "<leader>5",        "<cmd>Grapple select index=5<cr>",  desc = "[Grapple] Select fifth tag" },
-      { "<leader>h<Tab>",   "<cmd>Grapple cycle_tags next<cr>", desc = "Grapple cycle next tag" },
+      { "<leader>hm", "<cmd>Grapple toggle<cr>", desc = "Grapple toggle tag" },
+      { "<leader>hh", "<cmd>Grapple toggle_tags<cr>", desc = "Grapple open tags window" },
+      { "<leader>hs", "<cmd>Grapple open_scopes<cr>", desc = "Grapple open scopes window" },
+      { "<leader>hl", "<cmd>Grapple open_loaded<cr>", desc = "Grapple open loaded scopes window" },
+      { "<leader>1", "<cmd>Grapple select index=1<cr>", desc = "[Grapple] Select first tag" },
+      { "<leader>2", "<cmd>Grapple select index=2<cr>", desc = "[Grapple] Select second tag" },
+      { "<leader>3", "<cmd>Grapple select index=3<cr>", desc = "[Grapple] Select third tag" },
+      { "<leader>4", "<cmd>Grapple select index=4<cr>", desc = "[Grapple] Select fourth tag" },
+      { "<leader>5", "<cmd>Grapple select index=5<cr>", desc = "[Grapple] Select fifth tag" },
+      { "<leader>h<Tab>", "<cmd>Grapple cycle_tags next<cr>", desc = "Grapple cycle next tag" },
       { "<leader>h<S-tab>", "<cmd>Grapple cycle_tags prev<cr>", desc = "Grapple cycle previous tag" },
-      { "<Tab>",            "<cmd>Grapple cycle_tags next<cr>" },
-      { "<S-Tab>",          "<cmd>Grapple cycle_tags prev<cr>" },
+      { "<Tab>", "<cmd>Grapple cycle_tags next<cr>" },
+      { "<S-Tab>", "<cmd>Grapple cycle_tags prev<cr>" },
     },
   },
   {
     "nvim-telescope/telescope.nvim",
+    dependencies = {
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+        lazy = true,
+      },
+    },
+    config = function(_, opts)
+      require("telescope").load_extension("fzf")
+      require("telescope").setup(opts)
+    end,
     opts = function()
       local actions = require("telescope.actions")
       return {
@@ -105,9 +120,9 @@ return {
           end,
           desc = "Search Text",
         },
-        { "<leader>go", "<cmd>Telescope git_status<cr>",   desc = "Open changed file" },
+        { "<leader>go", "<cmd>Telescope git_status<cr>", desc = "Open changed file" },
         { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Checkout branch" },
-        { "<leader>gc", "<cmd>Telescope git_commits<cr>",  desc = "Checkout commit" },
+        { "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = "Checkout commit" },
         {
           "<leader>gC",
           "<cmd>Telescope git_bcommits<cr>",
@@ -118,7 +133,7 @@ return {
           "<cmd>Telescope diagnostics bufnr=0<cr>",
           desc = "Document Diagnostics",
         },
-        { "<leader>lw", "<cmd>Telescope diagnostics<cr>",          desc = "Workspace Diagnostics" },
+        { "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = "Workspace Diagnostics" },
         { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
         {
           "<leader>lS",
@@ -126,18 +141,18 @@ return {
           desc = "Workspace Symbols",
         },
         { "<leader>sb", "<cmd>Telescope git_branches<cr>", desc = "Checkout branch" },
-        { "<leader>sc", "<cmd>Telescope colorscheme<cr>",  desc = "Colorscheme" },
-        { "<leader>sf", "<cmd>Telescope find_files<cr>",   desc = "Find File" },
-        { "<leader>sh", "<cmd>Telescope help_tags<cr>",    desc = "Find Help" },
-        { "<leader>sH", "<cmd>Telescope highlights<cr>",   desc = "Find highlight groups" },
-        { "<leader>sM", "<cmd>Telescope man_pages<cr>",    desc = "Man Pages" },
-        { "<leader>sr", "<cmd>Telescope oldfiles<cr>",     desc = "Open Recent File" },
-        { "<leader>sR", "<cmd>Telescope resume<cr>",       desc = "Resume" },
+        { "<leader>sc", "<cmd>Telescope colorscheme<cr>", desc = "Colorscheme" },
+        { "<leader>sf", "<cmd>Telescope find_files<cr>", desc = "Find File" },
+        { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Find Help" },
+        { "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "Find highlight groups" },
+        { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
+        { "<leader>sr", "<cmd>Telescope oldfiles<cr>", desc = "Open Recent File" },
+        { "<leader>sR", "<cmd>Telescope resume<cr>", desc = "Resume" },
         -- { "<leader>sR", "<cmd>Telescope registers<cr>", desc = "Registers" },
-        { "<leader>st", "<cmd>Telescope live_grep<cr>",    desc = "Text" },
-        { "<leader>sk", "<cmd>Telescope keymaps<cr>",      desc = "Keymaps" },
-        { "<leader>sC", "<cmd>Telescope commands<cr>",     desc = "Commands" },
-        { "<leader>sl", "<cmd>Telescope resume<cr>",       desc = "Resume last search" },
+        { "<leader>st", "<cmd>Telescope live_grep<cr>", desc = "Text" },
+        { "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
+        { "<leader>sC", "<cmd>Telescope commands<cr>", desc = "Commands" },
+        { "<leader>sl", "<cmd>Telescope resume<cr>", desc = "Resume last search" },
         {
           "<leader>sp",
           "<cmd>lua require('telescope.builtin').colorscheme({enable_preview = true})<cr>",
@@ -147,10 +162,5 @@ return {
     end,
     cmd = "WhichKey",
     event = "VeryLazy",
-  },
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
-    lazy = true,
   },
 }
