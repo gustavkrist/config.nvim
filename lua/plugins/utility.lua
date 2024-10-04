@@ -60,7 +60,7 @@ return {
     "almo7aya/openingh.nvim",
     config = function()
       require("util.plugins").on_load("which-key.nvim", function()
-        require("which-key").add({ "<leader>og>", group = "Open in GitHub..." })
+        require("which-key").add({ "<leader>og", group = "Open in GitHub..." })
       end)
     end,
     keys = function()
@@ -86,7 +86,7 @@ return {
         {
           "<leader>ogl",
           function()
-            openingh(":OpenInGHFileLines")
+            openingh("OpenInGHFileLines", "v")
           end,
           mode = "v",
           desc = "Open line(s) in GitHub",

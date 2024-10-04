@@ -61,11 +61,13 @@ end
 
 --- Open picker for branch/commit and run vim function `fn` with picked value as argument
 ---@param fn string
-function M.run_openingh_with_picked_ref(fn)
+---@param mode string?
+function M.run_openingh_with_picked_ref(fn, mode)
   local branches = vim.fn.systemlist("git rev-parse --abbrev-ref origin/HEAD HEAD")
   local default = vim.fs.basename(branches[1])
   local current = string.gsub(branches[2], "%s*$", "")
   local commit = vim.fn.system("git log -n 1 --pretty=format:'%H'")
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, true, true), "n", false)
   vim.ui.select({
     { text = string.format("Current branch [%s]", current), value = current },
     { text = string.format("Default branch [%s]", default), value = default },
@@ -77,7 +79,11 @@ function M.run_openingh_with_picked_ref(fn)
     end,
   }, function(choice)
     if choice ~= nil then
-      vim.cmd(string.format("%s %s", fn, choice.value))
+      if mode == "v" then
+        vim.cmd(vim.api.nvim_replace_termcodes(string.format("normal gv:%s %s<CR>", fn, choice.value), true, true, true))
+      else
+        vim.cmd(string.format("%s %s", fn, choice.value))
+      end
     end
   end)
 end
