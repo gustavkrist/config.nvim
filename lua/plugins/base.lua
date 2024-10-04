@@ -136,9 +136,9 @@ return {
     cmd = "ASToggle",
     event = { "InsertLeave", "TextChanged" },
     config = function()
-      local function in_config_dir(buf)
+      local function in_snippets_dir(buf)
         for dir in vim.fs.parents(vim.api.nvim_buf_get_name(buf)) do
-          if dir == (os.getenv("XDG_CONFIG_HOME") .. "/nvim") then
+          if dir == (os.getenv("XDG_CONFIG_HOME") .. "/nvim/lua/luasnippets") then
             return true
           end
         end
@@ -151,8 +151,11 @@ return {
           if not utils.not_in(fn.getbufvar(buf, "&filetype"), { "oil" }) then
             return false
           end
-          return not in_config_dir(buf)
+          return not in_snippets_dir(buf)
         end,
+        execution_message = {
+          enabled = false,
+        },
       })
     end,
     keys = {
