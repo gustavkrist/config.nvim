@@ -29,12 +29,12 @@ return {
         ext_opts = {
           [types.choiceNode] = {
             active = {
-              virt_text = {{"●", "@comment.warning"}},
+              virt_text = { { "●", "@comment.warning" } },
             },
           },
           [types.insertNode] = {
             active = {
-              virt_text = {{"●", "@boolean"}},
+              virt_text = { { "●", "@boolean" } },
             },
           },
         },
@@ -44,23 +44,23 @@ return {
     build = "make install_jsregexp",
     event = "InsertEnter",
     keys = {
-      { "<C-n>", "<Plug>luasnip-next-choice", mode = "i" },
-      { "<C-n>", "<Plug>luasnip-next-choice", mode = "s" },
-      { "<C-p>", "<Plug>luasnip-prev-choice", mode = "i" },
-      { "<C-p>", "<Plug>luasnip-prev-choice", mode = "s" },
-      { "<C-u>", "<cmd>lua require('luasnip.extras.select_choice')()<cr>", mode = "i" },
-      { "<C-u>", "<cmd>lua require('luasnip.extras.select_choice')()<cr>", mode = "s" },
+      { "<C-n>",      "<Plug>luasnip-next-choice",                                    mode = "i" },
+      { "<C-n>",      "<Plug>luasnip-next-choice",                                    mode = "s" },
+      { "<C-p>",      "<Plug>luasnip-prev-choice",                                    mode = "i" },
+      { "<C-p>",      "<Plug>luasnip-prev-choice",                                    mode = "s" },
+      { "<C-u>",      "<cmd>lua require('luasnip.extras.select_choice')()<cr>",       mode = "i" },
+      { "<C-u>",      "<cmd>lua require('luasnip.extras.select_choice')()<cr>",       mode = "s" },
       { "<leader>se", "<cmd>lua require('luasnip.loaders').edit_snippet_files()<CR>", desc = "Edit snippets" },
     },
   },
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
-      { "hrsh7th/cmp-nvim-lsp", lazy = true },
-      { "hrsh7th/cmp-buffer", lazy = true },
-      { "hrsh7th/cmp-path", lazy = true },
-      { "hrsh7th/cmp-cmdline", lazy = true },
-      { "hrsh7th/cmp-nvim-lua", lazy = true },
+      { "hrsh7th/cmp-nvim-lsp",     lazy = true },
+      { "hrsh7th/cmp-buffer",       lazy = true },
+      { "hrsh7th/cmp-path",         lazy = true },
+      { "hrsh7th/cmp-cmdline",      lazy = true },
+      { "hrsh7th/cmp-nvim-lua",     lazy = true },
       { "saadparwaiz1/cmp_luasnip", lazy = true },
       "L3MON4D3/LuaSnip",
     },
@@ -132,6 +132,7 @@ return {
           { name = "buffer" },
           { name = "nvim_lua" },
           { name = "path" },
+          { name = "lazydev", group_index = 0 },
         }),
         formatting = {
           fields = { "kind", "abbr", "menu" },
@@ -198,10 +199,10 @@ return {
               luasnip.expand_or_jump()
             elseif cmp.visible() then
               cmp.select_next_item()
-            -- elseif cmp_util.jumpable(1) then
-            --   luasnip.jump(1)
-            -- elseif vim.bo.filetype == "tex" then
-            --   cmp_util.seek_delim(fallback)
+              -- elseif cmp_util.jumpable(1) then
+              --   luasnip.jump(1)
+              -- elseif vim.bo.filetype == "tex" then
+              --   cmp_util.seek_delim(fallback)
             elseif cmp_util.has_words_before() then
               cmp.complete()
             else

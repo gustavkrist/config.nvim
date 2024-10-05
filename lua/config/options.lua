@@ -67,4 +67,11 @@ vim.cmd([[
   set t_ZR=^[[23m
 ]])
 
-vim.diagnostic.config({ virtual_text = false, update_in_insert = false })
+-- make all keymaps silent by default
+local keymap_set = vim.keymap.set
+---@diagnostic disable-next-line: duplicate-set-field
+vim.keymap.set = function(mode, lhs, rhs, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  return keymap_set(mode, lhs, rhs, opts)
+end

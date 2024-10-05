@@ -186,3 +186,5 @@ require("util.plugins").on_very_lazy(function()
     toggle.map("<leader>uh", toggle.inlay_hints)
   end
 end)
+
+require("util.wezterm").setup()

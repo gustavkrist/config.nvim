@@ -249,11 +249,16 @@ return {
     end,
     event = "VeryLazy",
   },
+  { "justinsgithub/wezterm-types", lazy = true },
   {
     {
       "folke/lazydev.nvim",
       ft = "lua",
-      opts = {},
+      opts = {
+        library = {
+          { path = "wezterm-types", modes = { "wezterm" } },
+        },
+      },
     },
   },
   {

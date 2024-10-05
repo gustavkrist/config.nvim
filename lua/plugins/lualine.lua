@@ -333,7 +333,7 @@ return {
           lualine_x = {
             -- HACK: Removed `%*` from the end of the grapple-line output so the highlight group is not cut off
             --       which gets rid of an incorrecly highlighted cell
-            function() return require("grapple-line").lualine():match("^(.*)%%%*$") end,
+            function() return require("grapple-line").lualine():match("^(.*)%%%*$") or "" end,
           },
           lualine_z = {
             {
@@ -345,6 +345,11 @@ return {
           },
         },
         winbar = {
+          lualine_a = {
+            { require("util.navic").get_winbar },
+          },
+        },
+        inactive_winbar = {
           lualine_a = {
             { require("util.navic").get_winbar },
           },
