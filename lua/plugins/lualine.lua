@@ -326,11 +326,15 @@ return {
                   "spectre_panel",
                   "startify",
                   "toggleterm",
-        }, vim.api.nvim_get_option_value("filetype", {}))
+                }, vim.api.nvim_get_option_value("filetype", {}))
               end,
             },
           },
-          lualine_x = { require("grapple-line").lualine },
+          lualine_x = {
+            -- HACK: Removed `%*` from the end of the grapple-line output so the highlight group is not cut off
+            --       which gets rid of an incorrecly highlighted cell
+            function() return require("grapple-line").lualine():match("^(.*)%%%*$") end,
+          },
           lualine_z = {
             {
               "tabs",

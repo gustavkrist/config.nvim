@@ -177,6 +177,7 @@ return {
           ["cmp.entry.get_documentation"] = true,
         },
         progress = {
+          enabled = false,
           throttle = 100,
         },
       },

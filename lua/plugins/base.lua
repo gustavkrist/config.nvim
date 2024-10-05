@@ -19,15 +19,18 @@ return {
       local mappings = {
         {
           mode = "n",
-          { "<leader>S",  group = "Sessions" },
-          { "<leader>g",  group = "Git" },
-          { "<leader>h",  group = "Grapple" },
-          { "<leader>l",  group = "Lsp" },
-          { "<leader>n",  group = "Generate Annotations" },
-          { "<leader>o",  group = "Open in" },
-          { "<leader>og", group = "Open in GitHub.." },
-          { "<leader>s",  group = "Search" },
-          { "<leader>t",  group = "Terminal" },
+          { "<leader><Tab>", group = "Tabs" },
+          { "<leader>S",     group = "Sessions" },
+          { "<leader>g",     group = "Git" },
+          { "<leader>h",     group = "Grapple" },
+          { "<leader>l",     group = "Lsp" },
+          { "<leader>n",     group = "Generate Annotations" },
+          { "<leader>o",     group = "Open in" },
+          { "<leader>og",    group = "Open in GitHub.." },
+          { "<leader>q",     group = "Quickfix" },
+          { "<leader>s",     group = "Search" },
+          { "<leader>t",     group = "Terminal" },
+          { "<leader>u",     group = "Toggles" },
         },
       }
       which_key.setup(opts)

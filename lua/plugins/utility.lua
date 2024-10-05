@@ -51,7 +51,7 @@ return {
         })
       end
       return {
-        { "<leader>sg", grug_project_root, mode = { "n", "v" }, desc = "Search and Replace" },
+        { "<leader>sg", grug_project_root, mode = { "n", "v" }, desc = "[Grug] Search & Replace" },
       }
     end,
     cmd = "GrugFar",
