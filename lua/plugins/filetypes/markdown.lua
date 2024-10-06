@@ -191,7 +191,6 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons"
     },
-    version = "*",
     opts = {
       hybrid_modes = { "n" },
     },
