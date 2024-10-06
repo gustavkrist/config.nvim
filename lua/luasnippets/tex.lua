@@ -516,6 +516,17 @@ local autosnippets = {
     condition = in_mathzone,
   }),
   s({
+    trig = "^",
+    name = "Superscript",
+    wordTrig = false,
+  }, {
+    t("^{"),
+    i(1),
+    t("}"),
+  }, {
+    condition = in_mathzone,
+  }),
+  s({
     trig = "sts",
     name = "Subtext",
     wordTrig = false,

@@ -56,14 +56,6 @@ return {
     ft = { "markdown", "pandoc" },
   },
   {
-    "MeanderingProgrammer/render-markdown.nvim",
-    opts = {},
-    ft = "markdown",
-    -- Install pip package pylatexenc
-    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
-    version = "*",
-  },
-  {
     "epwalsh/obsidian.nvim",
     ft = "markdown",
     config = function(_, opts)
@@ -192,5 +184,17 @@ return {
     },
     ft = "markdown",
     cond = (not require("util.firenvim")()) and vim.fn.executable("magick") == 1
+  },
+  {
+    "OXY2DEV/markview.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons"
+    },
+    version = "*",
+    opts = {
+      hybrid_modes = { "n" },
+    },
+    ft = "markdown",
   },
 }
