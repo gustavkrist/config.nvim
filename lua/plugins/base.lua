@@ -222,30 +222,4 @@ return {
   {
     "airblade/vim-rooter"
   },
-  {
-    "gbprod/nord.nvim",
-    config = function(_, opts)
-      if vim.g.neovide ~= nil or require("util.firenvim")() then
-        opts.transparent = false
-      end
-      require("nord").setup(opts)
-      vim.api.nvim_create_autocmd("Colorscheme", {
-        pattern = { "nord" },
-        callback = function()
-          vim.cmd([[
-            hi! link NoiceLspProgressTitle @comment
-            hi NavicSeparator guibg=NONE
-            ]])
-        end,
-      })
-      vim.cmd("colorscheme nord")
-    end,
-    opts = {
-      transparent = true,
-      styles = {
-        comments = { italic = false },
-      },
-    },
-    priority = 1000,
-  },
 }

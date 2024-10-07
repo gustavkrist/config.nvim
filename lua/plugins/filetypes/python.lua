@@ -151,4 +151,27 @@ return {
       },
     },
   },
+  {
+    "alexpasmantier/pymple.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      -- optional (nicer ui)
+      "stevearc/dressing.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    build = ":PympleBuild",
+    config = function(_, opts)
+      require("pymple").setup(opts)
+    end,
+    opts = {
+      keymaps = {
+        resolve_import_under_cursor = {
+          desc = "Resolve import unser cursor",
+          keys = "<localleader>li",
+        },
+      },
+    },
+    event = "VeryLazy",
+  },
 }

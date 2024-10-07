@@ -127,8 +127,9 @@ return {
       on_open = function()
         local lualine_ok, lualine = pcall(require, "lualine")
         if lualine_ok then
-          lualine.hide({ place = { "statusline", "winbar", "tabline" }, unhide = false })
+          lualine.hide()
           vim.api.nvim_set_option_value("winbar", "", { scope = "local" })
+          vim.o.laststatus = 0
         end
         local ibl_ok, ibl = pcall(require, "ibl")
         if ibl_ok then
@@ -138,7 +139,7 @@ return {
       on_close = function()
         local lualine_ok, lualine = pcall(require, "lualine")
         if lualine_ok then
-          lualine.hide({ place = { "statusline", "winbar", "tabline" }, unhide = true })
+          lualine.hide({ unhide = true })
         end
         if ibl_ok then
           ibl.update({ enabled = true })

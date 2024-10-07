@@ -20,14 +20,15 @@ local firenvim = require("util.firenvim").get
 require("lazy").setup({
   spec = {
     { import = "plugins.base" },
+    { import = "plugins.colorschemes" },
     { import = "plugins.completion" },
     { import = "plugins.filetypes" },
-    { import = "plugins.mini" },
-    { import = "plugins.treesitter" },
-    { import = "plugins.utility" },
     { import = "plugins.lsp" },
     { import = "plugins.lualine" },
+    { import = "plugins.mini" },
     { import = "plugins.telescope-grapple" },
+    { import = "plugins.treesitter" },
+    { import = "plugins.utility" },
     { import = "plugins.visual" },
     { "glacambre/firenvim",                build = ":call firenvim#install(0)", cond = firenvim() }
   },

@@ -11,13 +11,6 @@ return {
         -- Headless mode, don't setup lualine
         return
       end
-      local color_template = vim.g.colors_name
-      local theme_supported, template = pcall(function()
-        require("lualine.utils.loader").load_theme(color_template)
-      end)
-      if theme_supported and template then
-        opts.options.theme = color_template
-      end
       require("lualine").setup(opts)
     end,
     opts = function()
@@ -208,30 +201,7 @@ return {
       }
       return {
         options = {
-          theme = {
-            normal = {
-              a = { fg = palette.frost.ice, bg = "NONE" },
-              b = { fg = palette.snow_storm.brighter, bg = "NONE" },
-              c = { fg = palette.snow_storm.brighter, bg = "NONE" },
-              x = { fg = palette.snow_storm.brighter, bg = "NONE" },
-              y = { fg = palette.aurora.purple, bg = "NONE" },
-              z = { fg = palette.frost.ice, bg = "NONE" },
-            },
-            insert = {
-              a = { fg = palette.snow_storm.origin, bg = "NONE" },
-            },
-            visual = {
-              a = { fg = palette.frost.polar_water, bg = "NONE" },
-            },
-            command = {
-              a = { fg = palette.aurora.purple },
-            },
-            inactive = {
-              a = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
-              b = { fg = require("nord.utils").make_global_bg(), bg = "NONE" },
-              c = { fg = palette.polar_night.bright, bg = "NONE" },
-            },
-          },
+          theme = "auto",
           globalstatus = true,
           icons_enabled = true,
           component_separators = { left = "", right = "" },

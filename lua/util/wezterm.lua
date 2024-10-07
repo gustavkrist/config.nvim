@@ -26,6 +26,14 @@ function M.base64(data)
   return b64
 end
 
+function M.reset_term_colors()
+  io.write("\027]104;\a")
+end
+
+function M.set_term_background(text, color, cursor)
+  io.write(string.format("\027]10;%s;%s;%s\a", text, color, cursor))
+end
+
 function M.set_user_var(key, value)
   io.write(string.format("\027]1337;SetUserVar=%s=%s\a", key, M.base64(value)))
 end
@@ -64,6 +72,12 @@ function M.setup()
   end
 
   M.set_user_var("IS_NVIM", true)
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    group = vim.api.nvim_create_augroup("_unset_is_nvim_uservar", { clear = true }),
+    callback = function(_)
+      M.set_user_var("IS_NVIM", false)
+    end
+  })
 
   -- Move to window using the movement keys
   for key, dir in pairs(nav) do
@@ -71,5 +85,12 @@ function M.setup()
     vim.keymap.set("n", "<C-" .. key .. ">", navigate(key), { desc = "Go to " .. dir .. " window" })
   end
 end
+
+vim.api.nvim_create_autocmd("VimLeavePre", {
+  group = vim.api.nvim_create_augroup("_reset_colorscheme", { clear = true }),
+  callback = function(_)
+    M.reset_term_colors()
+  end
+})
 
 return M
