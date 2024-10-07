@@ -1,9 +1,6 @@
 return {
   {
     "L3MON4D3/LuaSnip",
-    -- dependencies = {
-    --   { "rafamadriz/friendly-snippets", lazy = true },
-    -- },
     config = function(_, opts)
       require("luasnip.loaders.from_lua").lazy_load({
         paths = { "./lua/luasnippets" },
@@ -51,10 +48,21 @@ return {
       { "<C-u>",      "<cmd>lua require('luasnip.extras.select_choice')()<cr>",       mode = "i" },
       { "<C-u>",      "<cmd>lua require('luasnip.extras.select_choice')()<cr>",       mode = "s" },
       { "<leader>se", "<cmd>lua require('luasnip.loaders').edit_snippet_files()<CR>", desc = "Edit snippets" },
+      -- {
+      --   "<S-Tab>",
+      --   function()
+      --     local luasnip = require("luasnip")
+      --     if luasnip.locally_jumpable(-1) then
+      --       luasnip.jump(-1)
+      --     end
+      --   end,
+      --   mode = { "i", "s" }
+      -- }
     },
   },
   {
-    "hrsh7th/nvim-cmp",
+    "iguanacucumber/magazine.nvim",
+    name = "nvim-cmp",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp",     lazy = true },
       { "hrsh7th/cmp-buffer",       lazy = true },
@@ -253,5 +261,76 @@ return {
       }
     end,
     event = { "InsertEnter", "CmdlineEnter" },
+  },
+  {
+    -- TODO: Come back to this one when it supports luasnippets
+    'saghen/blink.cmp',
+    enabled = false,
+    lazy = false, -- lazy loading handled internally
+    -- optional: provides snippets for the snippet source
+    -- dependencies = 'rafamadriz/friendly-snippets',
+
+    -- use a release tag to download pre-built binaries
+    version = 'v0.*',
+    -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    -- build = 'cargo build --release',
+
+    opts = {
+      keymap = {
+        select_prev = { "<Down>", "<C-k>" },
+        select_next = { "<Up>", "<C-j>" },
+        accept = {},
+        snippet_forward = {},
+        snippet_backward = {},
+        scroll_documentation_up = {},
+        scroll_documentation_down = {},
+      },
+      highlight = {
+        -- sets the fallback highlight groups to nvim-cmp's highlight groups
+        -- useful for when your theme doesn't support blink.cmp
+        -- will be removed in a future release, assuming themes add support
+        use_nvim_cmp_as_default = true,
+      },
+      -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+      -- adjusts spacing to ensure icons are aligned
+      nerd_font_variant = 'normal',
+      providers = {
+        { "blink.cmp.sources.lsp" },
+        { "blink.cmp.sources.path" },
+        { "blink.cmp.sources.buffer" },
+      },
+      -- windows = {
+      --   documentation = {
+      --     border = "padded",
+      --     winhighlight = "Normal:BlinkCmpDoc,FloatBorder:Added,CursorLine:BlinkCmpDocCursorLine,Search:None",
+      --   },
+      -- },
+
+      -- experimental auto-brackets support
+      -- accept = { auto_brackets = { enabled = true } }
+
+      -- experimental signature help support
+      -- trigger = { signature_help = { enabled = true } }
+    },
+    keys = function()
+      local luasnip = require("luasnip")
+      return {
+        {
+          "<Tab>",
+          function()
+            local win = require("blink.cmp").windows.autocomplete.win
+            if luasnip.expand_or_locally_jumpable() then
+              luasnip.expand_or_jump()
+            elseif win:is_open() then
+              require("blink.cmp").accept()
+            else
+              return vim.api.nvim_feedkeys("\t", "n", true)
+            end
+          end,
+          mode = { "i", "s" },
+          noremap = true
+        }
+      }
+    end,
   },
 }

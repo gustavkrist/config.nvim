@@ -14,6 +14,9 @@ return {
       local vue_language_server_path = require("mason-registry").get_package("vue-language-server"):get_install_path()
           .. "/node_modules/@vue/language-server"
 
+      local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      local capabilities = ok and cmp_nvim_lsp.default_capabilities() or {}
+
       local servers = {
         bashls = true,
         fsautocomplete = true,
@@ -35,7 +38,7 @@ return {
             },
           },
           filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          capabilities = capabilities,
           on_attach = function(client, bufnr)
             if vim.api.nvim_get_option_value("filetype", { buf = bufnr }) ~= "vue" then
               require("nvim-navic").attach(client, bufnr)
@@ -58,8 +61,6 @@ return {
       end, vim.tbl_keys(servers))
 
       require("mason-tool-installer").setup({ ensure_installed = servers_to_install })
-
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       for name, config in pairs(servers) do
         if config == true then
