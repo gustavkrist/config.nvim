@@ -132,6 +132,7 @@ return {
           vim.o.laststatus = 0
         end
         local ibl_ok, ibl = pcall(require, "ibl")
+
         if ibl_ok then
           ibl.update({ enabled = false })
         end
@@ -150,5 +151,28 @@ return {
     keys = {
       { "<leader>uz", function() require("zen-mode").toggle() end, desc = "Toggle Zen Mode" },
     },
+  },
+  {
+    "xvzc/chezmoi.nvim",
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function(_, opts)
+      require("chezmoi").setup(opts)
+      require("util.plugins").on_load("telescope.nvim", function()
+        require("telescope").load_extension("chezmoi")
+        vim.keymap.set("n", "<leader>oc", require("telescope").extensions.chezmoi.find_files, {})
+      end)
+      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        pattern = { os.getenv("HOME") .. "/.local/share/chezmoi/*" },
+        callback = function(ev)
+          local bufnr = ev.buf
+          local edit_watch = function()
+            require("chezmoi.commands.__edit").watch(bufnr)
+          end
+          vim.schedule(edit_watch)
+        end,
+      })
+    end,
+    opts = {},
+    keys = { "<leader>oc" },
   },
 }
